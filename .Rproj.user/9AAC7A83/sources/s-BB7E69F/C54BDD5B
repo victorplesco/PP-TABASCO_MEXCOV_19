@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592848096071.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3655409295",
+    "id" : "C54BDD5B",
+    "lastKnownWriteTime" : 1592847861,
+    "last_content_update" : 1592847861,
+    "path" : "~/Progetti/TABASCO-MEXCOV-19/src/cleansing/ts_confirmed.R",
+    "project_path" : "src/cleansing/ts_confirmed.R",
+    "properties" : {
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
