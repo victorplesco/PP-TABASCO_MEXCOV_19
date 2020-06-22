@@ -1,6 +1,6 @@
 # TABASCO-MEXCOV-19
 
-![image](~/figs/mexico.jpeg)
+![image](~/TABASCO-MEXCOV-19/figs/mexico.jpeg)
 
 Usefull Links:
 
