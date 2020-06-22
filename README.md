@@ -1,6 +1,6 @@
 # TABASCO-MEXCOV-19
 
-![image](~/TABASCO-MEXCOV-19/figs/mexico.jpeg)
+![alt text](https://github.com/vrpo/TABASCO-MEXCOV-19/tree/master/figs/mexico.jpeg)
 
 Usefull Links:
 
