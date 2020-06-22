@@ -1,5 +1,9 @@
 # TABASCO-MEXCOV-19
 
+<p align="center">
+  <img src="https://github.com/vrpo/TABASCO-MEXCOV-19/tree/master/figs/mexico.jpeg" width="350" title="hover text">
+</p>
+
 ![](https://github.com/vrpo/TABASCO-MEXCOV-19/tree/master/figs/mexico.jpeg)
 
 Usefull Links:
