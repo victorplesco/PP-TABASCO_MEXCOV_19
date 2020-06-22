@@ -19,7 +19,7 @@ Deaths at daily level per region: `ts_deaths` <br/>
 
 From your R script run
 
- 1. `source("~/TABASCO-MEXCOV-19/src/packages/autoinstall.R")` to update used packages <br/>
+ 1. `source("~/TABASCO-MEXCOV-19/src/packages/autoinstall.R")` to install/update and require used packages <br/>
  2. `source("~/TABASCO-MEXCOV-19/src/cleansing/<DATASET_NAME>.R")` to gather specific dataset <br/>
 
 
