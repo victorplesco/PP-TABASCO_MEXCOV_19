@@ -11,9 +11,9 @@ Usefull Links:
 
 Data:
 
-**population** - Distribution of population across different regions of Mexico.
-**confirmedraw** - Single confirmed cases data.
-**ts_confirmed** - Time series of confirmed cases per regions of Mexico.
-**ts_deaths** - Time series of deaths per regions of Mexico. 
+**population** - Distribution of population across different regions of Mexico. <br/>
+**confirmedraw** - Single confirmed cases data. <br/>
+**ts_confirmed** - Time series of confirmed cases per regions of Mexico. <br/>
+**ts_deaths** - Time series of deaths per regions of Mexico. <br/>
 
-source("~/TABASCO-MEXCOV-19/src/cleansing/[DATASET].R")
+`source("~/TABASCO-MEXCOV-19/src/cleansing/[DATASET].R")`
