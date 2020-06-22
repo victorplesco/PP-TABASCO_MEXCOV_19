@@ -15,7 +15,13 @@ Individual level details per confirmed case: `confirmedraw` <br/>
 Confirmed cases at daily level per region: `ts_confirmed` <br/>
 Deaths at daily level per region: `ts_deaths` <br/>
 
-To gather a dataset run `source("~/TABASCO-MEXCOV-19/src/cleansing/<DATASET_NAME>.R")` from your R script file.
+**Notes**
+
+From your R script run
+
+ 1. `source("~/TABASCO-MEXCOV-19/src/packages/autoinstall.R")` to update used packages <br/>
+ 2. `source("~/TABASCO-MEXCOV-19/src/cleansing/<DATASET_NAME>.R")` to gather specific dataset <br/>
+
 
 **Project Links**
 
