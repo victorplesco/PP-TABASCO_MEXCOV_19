@@ -1,5 +1,7 @@
 # TABASCO-MEXCOV-19
 
+![image](~/figs/mexico.jpeg)
+
 Usefull Links:
 
 1. Source: https://github.com/carloscerlira/COVIDMX/tree/master
