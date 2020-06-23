@@ -28,8 +28,12 @@ From your R script run
   1. Data source: https://github.com/carloscerlira/COVIDMX/tree/master
   2. Kaggle: https://www.kaggle.com/carloslira/covid19-mexico
  
- **Extra Links**
+**Extra Links**
  
   1. COVID-19 pandemic in Mexico: https://en.wikipedia.org/wiki/COVID-19_pandemic_in_Mexico 
+  2. Demographics of Mexico: https://en.wikipedia.org/wiki/Demographics_of_Mexico#Demographic_dynamics
+  
+**ARIMA**
+ 
+  1. Kaggle: https://www.kaggle.com/nitishabharathi/the-story-of-covid-19-in-india-eda-and-prediction#Prediction-
   2. ARIMA in R: https://otexts.com/fpp2/arima-r.html 
-  3. Kaggle: https://www.kaggle.com/nitishabharathi/the-story-of-covid-19-in-india-eda-and-prediction#Prediction-
