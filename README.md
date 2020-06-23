@@ -31,3 +31,7 @@ From your R script run
  **Extra Links**
  
   1. COVID-19 pandemic in Mexico: https://en.wikipedia.org/wiki/COVID-19_pandemic_in_Mexico
+  
+  ARIMA:
+  2. ARIMA in R: https://otexts.com/fpp2/arima-r.html <br/>
+  3. Kaggle: https://www.kaggle.com/nitishabharathi/the-story-of-covid-19-in-india-eda-and-prediction#Prediction- <br/>
