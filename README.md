@@ -39,3 +39,4 @@ From your R script run
  
   1. Kaggle: https://www.kaggle.com/nitishabharathi/the-story-of-covid-19-in-india-eda-and-prediction#Prediction-
   2. ARIMA in R: https://otexts.com/fpp2/arima-r.html 
+  3. Using R for Time Series Analysis: https://a-little-book-of-r-for-time-series.readthedocs.io/en/latest/src/timeseries.html
