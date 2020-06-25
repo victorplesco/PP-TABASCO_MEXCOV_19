@@ -14,7 +14,8 @@ Population at state level: `population` <br/>
 Individual level details per confirmed case: `confirmedraw` <br/>
 Confirmed cases at daily level per region: `ts_confirmed` <br/>
 Deaths at daily level per region: `ts_deaths` <br/>
-Estimated demographics: `demographics_2020e` <br/> 
+Estimated demographics: `demographics_2020e` <br/>
+Generated population: `population_2020e` <br/>
 
 **Notes**
 
