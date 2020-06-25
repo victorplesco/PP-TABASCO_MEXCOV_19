@@ -1,1 +1,5 @@
-population_2020e <- read_feather("~/TABASCO-MEXCOV-19/data/metadata/population/population_2020e.feather")
+temp <- tempfile(fileext = ".zip")
+gd   <- drive_download(as_id("1WZpzwytogP3gwroeLdGmfwGs5HEFpTEl"), path = temp, overwrite = TRUE)
+out <- unzip(temp, exdir = tempdir())
+population_2020e <- read_feather(out)
+rm(gd, out, temp)
