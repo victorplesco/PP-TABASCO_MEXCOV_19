@@ -1,0 +1,1 @@
+population_2020e <- read_feather("~/TABASCO-MEXCOV-19/data/metadata/population/population_2020e.feather")

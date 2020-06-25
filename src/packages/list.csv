@@ -2,3 +2,5 @@ package
 knitr
 tibble
 dplyr
+data.table
+feather
