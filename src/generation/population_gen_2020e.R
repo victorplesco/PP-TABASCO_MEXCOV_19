@@ -7,7 +7,7 @@ females <- data.frame(Age        = demographics_2020e$Age,
                       Gender     = rep(1, nrow(demographics_2020e)),
                       Percentage = demographics_2020e$Percentage_Female)
 
-total    <- rbind(males, females)
+total <- rbind(males, females)
 
 source("~/TABASCO-MEXCOV-19/src/cleansing/population.R")
 population <- population[-33,]
@@ -33,7 +33,7 @@ for(i in 1:nrow(population))
 n <- c()
 for(i in 1:nrow(population))
 {
-  n[i] = length(which(population_2020e$Age   == "unknown" & population_2020e$State == population[i, 1]));
+  n[i] = length(which(population_2020e$Age == "unknown" & population_2020e$State == population[i, 1]));
   cat("Iteration: ", i, "\n");
 }
 
@@ -47,7 +47,7 @@ for(i in 1:nrow(population))
 
 for(i in 1:nrow(population))
 {
-  population_2020e[list_of_vecs[[i]], 2] = sample(total$Age, size = n[i], prob = total$Percentage, replace = TRUE);
+  population_2020e[list_of_vecs[[i]], 2] = as.character(sample(total$Age[-c(22, 44)], size = n[i], prob = total$Percentage[-c(22, 44)]/sum(total$Percentage[-c(22, 44)]), replace = TRUE));
   cat("Iteration: ", i, "\n");
 }
 

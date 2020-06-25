@@ -8,3 +8,4 @@ for(i in 1:nrow(list))
     library(as.character(list[i, 1]), character.only = TRUE)
   }
 }
+rm(i, list)
