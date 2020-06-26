@@ -12,8 +12,8 @@ Coronaviruses are a large family of viruses which may cause illness in animals o
 
 Population at state level: `population` <br/>
 Individual level details per confirmed case: `confirmedraw` <br/>
-Confirmed cases at daily level per region: `ts_confirmed` <br/>
-Deaths at daily level per region: `ts_deaths` <br/>
+Confirmed cases at daily level per region: `ts_confirmed`; Transposed: `trans_ts_confirmed` <br/>
+Deaths at daily level per region: `ts_deaths`; Transposed: `trans_ts_deaths` <br/>
 Estimated demographics based on census 2010: `demographics_2020e` <br/>
 Estimated population based on census 2010: `population_2020e` <br/>
 
