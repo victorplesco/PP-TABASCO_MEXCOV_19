@@ -30,7 +30,7 @@ From your R script run
 
   1. [Kaggle: COVID-19 Mexico](https://www.kaggle.com/carloslira/covid19-mexico)
   2. [Data source: github/carloscerlira](https://github.com/carloscerlira/COVIDMX/tree/master)
-  3. [Gobierno de Mexio](https://www.gob.mx/salud/documentos/datos-abiertos-152127)
+  3. [Gobierno de Mexico](https://www.gob.mx/salud/documentos/datos-abiertos-152127)
  
 **Extra Links**
  
