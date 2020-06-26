@@ -27,8 +27,8 @@ From your R script run
 
 **Project Links**
 
-  1. [Kaggle](https://www.kaggle.com/carloslira/covid19-mexico)
-  2. [Data source](https://github.com/carloscerlira/COVIDMX/tree/master)
+  1. [Kaggle: COVID-19 Mexico](https://www.kaggle.com/carloslira/covid19-mexico)
+  2. [Data source: github/carloscerlira](https://github.com/carloscerlira/COVIDMX/tree/master)
  
 **Extra Links**
  
