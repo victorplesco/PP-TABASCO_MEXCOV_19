@@ -2,6 +2,8 @@ source("~/TABASCO-MEXCOV-19/src/packages/autoinstall.R")
 source("~/TABASCO-MEXCOV-19/src/cleansing/population_2020e.R")
 source("~/TABASCO-MEXCOV-19/src/cleansing/confirmedraw.R")
 
+options(scipen = 999)
+
 population_2020e$Infected <- 0; confirmedraw$Infected <- 1;
 confirmedraw <- confirmedraw[, c(1, 3, 2, 5)];
 pop_test <- rbind(population_2020e, confirmedraw)
@@ -9,12 +11,23 @@ pop_test <- rbind(population_2020e, confirmedraw)
 # write_feather(pop_test, "~/TABASCO-MEXCOV-19/pop_test.R")
 # pop_test <- read_feather("~/TABASCO-MEXCOV-19/pop_test.R")
 
+##
+## Gender
+##
+
 cont_tot_gender <- table(pop_test$Infected, pop_test$Gender)
 table_tot_gender <- data.frame(Male   = c(cont_tot_gender[, 1], sum(cont_tot_gender[, 1])),
                                Female = c(cont_tot_gender[, 2], sum(cont_tot_gender[, 2])),
                                Tot    = c(sum(cont_tot_gender[1, ]), sum(cont_tot_gender[2, ]), nrow(pop_test)))
 rownames(table_tot_gender) <- c("Non Infected", "Infected", "Tot")
 table_frq_gender <- table_tot_gender/nrow(pop_test)
+
+##
+## Age
+##
+
+pop_test$age_delim <- as.numeric(gsub("-", "", substr(pop_test$Age, start = 1, stop = 2)))
+pop_test <- pop_test[order(pop_test$age_delim)]
 
 cont_tot_age <- table(pop_test$Infected, pop_test$Age)
 table_tot_age <- data.frame()
