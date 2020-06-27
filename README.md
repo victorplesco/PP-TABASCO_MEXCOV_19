@@ -14,6 +14,11 @@ Population at state level: `population` <br/>
 Individual level details per confirmed case: `confirmedraw` <br/>
 Confirmed cases at daily level per region: `ts_confirmed`; Transposed: `trans_ts_confirmed` <br/>
 Deaths at daily level per region: `ts_deaths`; Transposed: `trans_ts_deaths` <br/>
+
+**[UPDATED 25/06]** Individual level details per buffer: `buffersraw` <br/>
+**[UPDATED 25/06]** Buffers at daily level per region: `ts_buffers`<br/>
+**[UPDATED 25/06]** Deaths at daily level per region: `new_deaths` <br/>
+
 Estimated demographics based on census 2010: `demographics_2020e` <br/>
 Estimated population based on census 2010: `population_2020e` <br/>
 First data structure used in the models: `first_attempt` <br/>
