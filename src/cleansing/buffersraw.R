@@ -22,11 +22,11 @@ states <- levels(buffersraw$ENTIDAD_FEDERATIVA)
 north  <- states[c(2, 3, 26, 6, 8, 25, 10)];
 south  <- states[c(30, 20, 27, 5, 4, 23, 31)];
 center <- states[-c(2, 3, 26, 6, 8, 25, 10, 30, 20, 27, 5, 4, 23, 31)];
-buffersraw$State.Labels <- NA;
-buffersraw$State.Labels[which(buffersraw$ENTIDAD_FEDERATIVA %in% north)]  <- "North";
-buffersraw$State.Labels[which(buffersraw$ENTIDAD_FEDERATIVA %in% south)]  <- "South";
-buffersraw$State.Labels[which(buffersraw$ENTIDAD_FEDERATIVA %in% center)] <- "Center";
-buffersraw$State.Labels <- as.factor(buffersraw$State.Labels);
+buffersraw$Region <- NA;
+buffersraw$Region[which(buffersraw$ENTIDAD_FEDERATIVA %in% north)]  <- "North";
+buffersraw$Region[which(buffersraw$ENTIDAD_FEDERATIVA %in% south)]  <- "South";
+buffersraw$Region[which(buffersraw$ENTIDAD_FEDERATIVA %in% center)] <- "Center";
+buffersraw$Region <- as.factor(buffersraw$Region);
 # {ENTIDAD_UM = State, SEXO = Gender, EDAD = Age, RESULTADO = Result, FECHA_SINTOMAS = Date_Confirmed, FECHA_DEF = Date_Death}
-colnames(buffersraw) <- c("Gender", "Age", "Result", "Date_Confirmed", "Date_Death", "State", "State.Labels");
+colnames(buffersraw) <- c("Gender", "Age", "Result", "Date_Confirmed", "Date_Death", "State", "Region");
 rm(buffers, entidas, center, north, south, states);
