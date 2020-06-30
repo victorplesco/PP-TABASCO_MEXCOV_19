@@ -1,13 +1,13 @@
 source("~/TABASCO-MEXCOV-19/src/cleansing/buffersraw.R")
-new_deaths <- data.frame(Date = sort(unique(buffersraw$Date_Confirmed)))
+new_deaths <- data.frame(Date = sort(unique(buffersraw$dConfirmed)))
 colnames   <- sort(as.character(unique(buffersraw$State)))
-buffersraw <- buffersraw[-c(which(is.na(buffersraw$Date_Death))),]
+buffersraw <- buffersraw[-c(which(is.na(buffersraw$dDeaths))),]
 for(i in 1:length(unique(buffersraw$State)))
 {
   tmp = buffersraw %>% filter(Result == "Positive" & State == sort(as.character(unique(buffersraw$State)))[i]) %>%
-                       group_by(Date_Death) %>%
+                       group_by(dDeaths) %>%
                        summarise(Deaths = n())
-  new_deaths = merge(x = new_deaths, y = tmp, by.x = "Date", by.y = "Date_Death", all.x = TRUE);
+  new_deaths = merge(x = new_deaths, y = tmp, by.x = "Date", by.y = "dDeaths", all.x = TRUE);
   colnames(new_deaths)[i + 1] = colnames[i];
 }
 new_deaths[is.na(new_deaths)] <- 0;

@@ -28,5 +28,5 @@ buffersraw$Region[which(buffersraw$ENTIDAD_FEDERATIVA %in% south)]  <- "South";
 buffersraw$Region[which(buffersraw$ENTIDAD_FEDERATIVA %in% center)] <- "Center";
 buffersraw$Region <- as.factor(buffersraw$Region);
 # {ENTIDAD_UM = State, SEXO = Gender, EDAD = Age, RESULTADO = Result, FECHA_SINTOMAS = Date_Confirmed, FECHA_DEF = Date_Death}
-colnames(buffersraw) <- c("Gender", "Age", "Result", "Date_Confirmed", "Date_Death", "State", "Region");
+colnames(buffersraw) <- c("Gender", "Age", "Result", "dConfirmed", "dDeaths", "State", "Region");
 rm(buffers, entidas, center, north, south, states);
