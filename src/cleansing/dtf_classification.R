@@ -3,7 +3,7 @@ source("~/TABASCO-MEXCOV-19/src/cleansing/new_deaths.R")
 source("~/TABASCO-MEXCOV-19/src/cleansing/buffersraw.R")
 
 dtf.class <- buffersraw[which(buffersraw$Result != "Pending"),]; dtf.class <- dtf.class[, c(1, 2, 6, 3, 7, 4, 5)];
-dtf.class$Result <- droplevels(dtf.class$Result); levels(dtf.class$Result) <- c("1", "0"); dtf.class$Result <- factor(dtf.class$Result, levels = c("0", "1"));
+dtf.class$Result <- droplevels(dtf.class$Result); dtf.class$Result <- factor(dtf.class$Result, levels = c("Negative", "Positive")); 
 dtf.class$WeekDays <- as.factor(weekdays(as.POSIXct(as.character(dtf.class$dConfirmed), format = "%Y-%m-%d"), abbreviate = F));
 levels(dtf.class$WeekDays) <- c("Sunday", "Thursday", "Monday", "Tuesday", "Wednesday", "Saturday", "Friday");
 dtf.class$WeekDays <- factor(dtf.class$WeekDays, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"));
@@ -14,14 +14,14 @@ source("~/TABASCO-MEXCOV-19/src/support/age_intervals.R")
 dtf.class$Age.Labels <- cut(dtf.class$Age, breaks = breaks, labels = age_classes, include.lowest = TRUE)
 
 # Merge - Confirmed;
-ts_buffers$Aggregated <- cumsum(ts_buffers$NACIONAL)
-pre.merge.confirmed <- ts_buffers[, c("Date", "Aggregated")]
+pre.merge.confirmed <- ts_buffers[, c("Date", "NACIONAL")]
 dtf.class <- merge(dtf.class, pre.merge.confirmed, by.x = "dConfirmed", by.y = "Date", all.x = TRUE)
+colnames(dtf.class)[colnames(dtf.class) == "NACIONAL"] <- "daily_Confirmed";
 
 # Merge - Deaths;
-new_deaths$Aggregated <- cumsum(new_deaths$NACIONAL)
-pre.merge.deaths <- new_deaths[, c("Date", "Aggregated")]
+pre.merge.deaths <- new_deaths[, c("Date", "NACIONAL")]
 dtf.class <- merge(dtf.class, pre.merge.deaths, by.x = "dDeaths", by.y = "Date", all.x = TRUE)
+colnames(dtf.class)[colnames(dtf.class) == "NACIONAL"] <- "daily_Deaths";
 
 train_set <- dtf.class[dtf.class$dConfirmed <= "2020-04-18",]
 test_set  <- dtf.class[dtf.class$dConfirmed > "2020-04-18",]

@@ -1,9 +1,34 @@
 source("~/TABASCO-MEXCOV-19/src/packages/autoinstall.R")
 source("~/TABASCO-MEXCOV-19/src/cleansing/dtf_classification.R")
 
+
 #################################################################################################################################################################################################################################################################################
 ## Contingency Analysis: Independence ###########################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
+
+
+##
+## WeekDays
+##
+
+weekdays.table <- with(train_set, table(Result, WeekDays))
+chisq.test(weekdays.table)
+CramerV(weekdays.table)
+
+## Plot
+mosaicplot(t(weekdays.table), col = c("indianred", "dodgerblue"), cex.axis = 1, sub = "", ylab = "", main = "")
+
+source("~/TABASCO-MEXCOV-19/src/cleansing/ts_buffers.R")
+ts_buffers$WeekDays <- as.factor(weekdays(as.POSIXct(as.character(ts_buffers$Date), format = "%Y-%m-%d"), abbreviate = F));
+levels(ts_buffers$WeekDays) <- c("Sunday", "Thursday", "Monday", "Tuesday", "Wednesday", "Saturday", "Friday");
+ts_buffers$WeekDays <- factor(ts_buffers$WeekDays, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"));
+
+dev.off()
+ggplot() + 
+  geom_line(data = ts_buffers, aes(x = Date, y = NACIONAL), col = "red2") +
+  geom_point(data = ts_buffers[ts_buffers$WeekDays == "Saturday",], aes(x = Date, y = NACIONAL), col = "dodgerblue") +
+  geom_point(data = ts_buffers[ts_buffers$WeekDays == "Sunday",], aes(x = Date, y = NACIONAL), col = "black") +
+  theme_bw()
 
 ##
 ## Age
@@ -23,12 +48,13 @@ ggplot(data = train_set, aes(x = Result, y = Age)) +
 
 ## t.test
 
-#   Normality Assumption
+# Normality Assumption
 par(mfrow = c(1, 2))
-qqnorm(train_set$Age[train_set$Result == "Positive"])
-qqline(train_set$Age[train_set$Result == "Positive"], col = "red2")
-qqnorm(train_set$Age[train_set$Result == "Negative"])
-qqline(train_set$Age[train_set$Result == "Negative"], col = "red2")
+qqnorm(train_set$Age[train_set$Result == "1"], sub = "Result | Positive")
+qqline(train_set$Age[train_set$Result == "1"], col = "red2")
+qqnorm(train_set$Age[train_set$Result == "0"], sub = "Result | Negative")
+qqline(train_set$Age[train_set$Result == "0"], col = "red2")
+par(mfrow = c(1, 1))
 
 t.test(Age ~ Result, data = train_set, var.equal = FALSE)
 
@@ -175,26 +201,79 @@ mosaicplot(t(Region.table), col = c("indianred", "dodgerblue"), cex.axis = 1, su
 ## Contingency Analysis: Logistic Regression ####################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
-
-glm.logit.fit <- glm(Result ~ Age + Region + Gender + WeekDays, family = binomial(link = "logit"), data = train_set)
+  
+glm.logit.fit <- glm(Result ~ Age.Labels + Gender + WeekDays, family = binomial(link = "logit"), data = train_set)
 # summary(glm.logit.fit)
+anova(glm.logit.fit, test = "Chisq")
 
-ts_buffers$Aggregated <- cumsum(ts_buffers$NACIONAL)
-pre.merge <- ts_buffers[, c("Date", "Aggregated")]
+# install.packages("pscl")
+require(pscl)
 
-test_set  <- as.data.frame(buffersraw %>% filter(Result != "Pending" & dConfirmed > "2020-04-18"))
-test_set$Result <- droplevels(test_set$Result); levels(test_set$Result) <- c("0", "1");
-test_set$WeekDays <- as.factor(weekdays(as.POSIXct(test_set$dConfirmed, format = "%Y-%m-%d"), abbreviate = F));
-test_set$WeekEnds <- as.factor(ifelse(as.character(test_set$WeekDays) != "sabato" & as.character(test_set$WeekDays) != "domenica", "0", "1"));
+list(model1 = pscl::pR2(glm.logit.fit1)["McFadden"],
+     model2 = pscl::pR2(glm.logit.fit2)["McFadden"],
+     model  = pscl::pR2(glm.logit.fit )["McFadden"])
 
-source("~/TABASCO-MEXCOV-19/src/support/age_intervals.R")
-# Last Update: granularity = 2;
-test_set$Age.Labels <- cut(test_set$Age, breaks = breaks, labels = age_classes, include.lowest = TRUE)
+glm.logit.fit1 <- glm(Result ~ Age.Labels, family = binomial(link = "logit"), data = train_set)
+glm.logit.fit2 <- glm(Result ~ Age.Labels + WeekDays, family = binomial(link = "logit"), data = train_set)
+anova(glm.logit.fit1, glm.logit.fit2, glm.logit.fit, test = "Chisq")
 
-test_set <- merge(test_set, pre.merge, by.x = "dConfirmed", by.y = "Date", all.x = TRUE)
 
-# install.packages("caret")
-# require(caret)  
+cutoff <- seq(0.01, 1, 0.01);
+indexes <- data.frame(Sensitivity = rep(NA, length(cutoff)),
+                      Specificity = rep(NA, length(cutoff)),
+                      Accuracy    = rep(NA, length(cutoff)))
+glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = test_set[, c("Age.Labels", "Gender", "Region", "WeekDays")], type = "response")); 
+tmp <- test_set$Result;
+for(i in 1:length(cutoff))
+{
+  predicted.classes <- as.factor(ifelse(glm.logit.predict > cutoff[i], "Positive", "Negative")); 
+  tmp2 = confusionMatrix(data = predicted.classes, reference = tmp);
+  
+  indexes$Sensitivity[i] = tmp2$table[1, 1] / sum(tmp2$table[1, 1:2]);
+  indexes$Specificity[i] = tmp2$table[2, 1] / sum(tmp2$table[2, 1:2]);
+  indexes$Accuracy[i]    = sum(tmp2$table[1, 1], tmp2$table[2, 2]) / sum(tmp2$table[1:2, 1:2]);
+}
 
-glm.logit.predict <- predict(glm.logit.fit, newdata = test_set)
-confusionMatrix(data = as.factor(as.character(as.numeric(glm.logit.predict > 0.5))), reference = test_set$Result)
+ggplot() + geom_line(aes(x = cutoff, y = indexes$Sensitivity), col = "indianred") +
+           geom_line(aes(x = cutoff, y = (1 - indexes$Specificity)), col = "dodgerblue") +
+           geom_line(aes(x = cutoff, y = indexes$Accuracy), col = "black") +
+           theme_bw()
+          
+## Aggregated
+glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = test_set[, c("Age.Labels", "Gender", "Region", "WeekDays")], type = "response")); 
+predicted.classes <- as.factor(ifelse(glm.logit.predict > 0.3125, "Positive", "Negative")); tmp <- test_set$Result;
+confusionMatrix(data = predicted.classes, reference = tmp)$table/sum(confusionMatrix(data = predicted.classes, reference = tmp)$table);
+
+## Daily
+dIndex <- data.frame(Date = unique(test_set$dConfirmed),
+                     Confirmed = rep(NA, length(unique(test_set$dConfirmed))))
+minDate <- c()
+for(i in 1:nrow(dIndex)) {minDate[i] = min(which(test_set$dConfirmed == dIndex[i, 1]))}
+maxDate <- c()
+for(i in 1:nrow(dIndex)) {maxDate[i] = max(which(test_set$dConfirmed == dIndex[i, 1]))}
+for(i in 1:nrow(dIndex))
+{
+  tmp = as.data.frame(test_set %>% filter(test_set$dConfirmed == dIndex[i, 1]) %>%
+                        select(Age, Gender, Region, WeekDays, Result));
+  glm.logit.predict = as.vector(predict(glm.logit.fit, newdata = tmp[, -5], type = "response")); 
+  tmp2 = as.factor(ifelse(glm.logit.predict > 0.3125, "Positive", "Negative"));
+  dIndex[i, 2] = confusionMatrix(data = tmp2, reference = tmp$Result)$table[2, 2]; 
+}
+
+tmp <- as.data.frame(test_set %>% group_by(dConfirmed) %>% summarise(COUNT = n()))
+ggplot() + geom_line(data = tmp, aes(x = dConfirmed, y = COUNT), col = "red2") +
+           geom_line(data = dIndex, aes(x = Date, y = Confirmed), col = "black") +
+  theme_bw()
+
+
+#################################################################################################################################################################################################################################################################################
+## Contingency Analysis: Tree Model #############################################################################################################################################################################################################################################
+#################################################################################################################################################################################################################################################################################
+
+
+
+
+
+
+
+
