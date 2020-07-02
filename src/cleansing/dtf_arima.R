@@ -10,6 +10,7 @@ dtf.reg$lag_1_Confirmed <- c(0, dtf.reg$dTotal[-100])
 dtf.reg$lag_2_Confirmed <- c(rep(0, 2), dtf.reg$dTotal[-c(99:100)])
 dtf.reg$lag_3_Confirmed <- c(rep(0, 3), dtf.reg$dTotal[-c(98:100)])
 
-train_set <- dtf.reg[which(dtf.reg$Date <= "2020-04-18"),];
-test_set  <- dtf.reg[which(dtf.reg$Date >  "2020-04-18"),];
+train_set <- dtf.reg[which(dtf.reg$Date <= "2020-04-10"),];
+test_set  <- dtf.reg[which(dtf.reg$Date >  "2020-04-10" & dtf.reg$Date <= "2020-04-18"),];
+real_set  <- dtf.reg[which(dtf.reg$Date > "2020-04-18"),]
 rm(buffersraw, dtf.reg, buffers_ts, states);

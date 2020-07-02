@@ -1,0 +1,37 @@
+---
+title: "TABASCO-MEXCOV-19"
+author: "Andrea Cicchini, Thomas Deponde, Rossella Marvulli, Victor Plesco"
+date: "July 3, 2020"
+output:
+  slidy_presentation: default
+  
+---
+
+## Index
+
+- Introduction
+- Logistic Regression
+- Autoregressive Model (ARIMA)
+- Poisson Regression
+- Linear Polynomial Regression
+
+## Introduction
+
+The data used within this project has been gathered from the [government of Mexico's website](https://www.gob.mx/salud/documentos/datos-abiertos-152127) and is composed of 528.651 records related to the executed swabs, having as purpose the detection of covid infections, across the states of Mexico between 2020-01-01 and 2020-06-25. Each record specifies the **`Gender`** and **`Age`** of the unit on which the swab was executed, the **`State`** and **`Region`** in which the test was executed, the **`swab_Date`** of execution and its **`Result`**, amongside the eventual **`death_Date`** of the infected unit.  
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+require(dplyr)
+require(kableExtra)
+
+dtf_classification <- read.csv("~/dtf_classification..csv"); 
+colnames(buffersraw) <- c("Gender", "Age", "Result", "swab_Date", "death_Date", "State", "Region");
+kable(head(buffersraw[-which(is.na(buffersraw$death_Date)),]), row.names = FALSE)  %>%
+  kable_styling(position = "center")
+```
+
+## Slide with Plot
+
+```{r pressure}
+plot(pressure)
+```
+
