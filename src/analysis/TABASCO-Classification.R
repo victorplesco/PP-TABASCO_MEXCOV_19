@@ -168,22 +168,23 @@ CramerV(weekdays.table);
 
 mosaicplot(t(weekdays.table), col = c("indianred", "dodgerblue"), cex.axis = 1, sub = "", ylab = "", main = "");
 
-source("~/TABASCO-MEXCOV-19/src/cleansing/ts_buffers.R")
-ts_buffers$WeekDays <- as.factor(weekdays(as.POSIXct(as.character(ts_buffers$Date), format = "%Y-%m-%d"), abbreviate = F));
-levels(ts_buffers$WeekDays) <- c("Sunday", "Thursday", "Monday", "Tuesday", "Wednesday", "Saturday", "Friday");
-ts_buffers$WeekDays <- factor(ts_buffers$WeekDays, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"));
+source("~/TABASCO-MEXCOV-19/src/cleansing/buffers_ts.R")
+buffers_ts$WeekDays <- as.factor(weekdays(as.POSIXct(as.character(buffers_ts$Date), format = "%Y-%m-%d"), abbreviate = F));
+levels(buffers_ts$WeekDays) <- c("Sunday", "Thursday", "Monday", "Tuesday", "Wednesday", "Saturday", "Friday");
+buffers_ts$WeekDays <- factor(buffers_ts$WeekDays, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"));
 
 dev.off()
 ggplot() + 
-  geom_line(data = ts_buffers, aes(x = Date, y = NACIONAL), col = "red2") +
-  geom_point(data = ts_buffers[ts_buffers$WeekDays == "Saturday",], aes(x = Date, y = NACIONAL), col = "dodgerblue") +
-  geom_point(data = ts_buffers[ts_buffers$WeekDays == "Sunday",], aes(x = Date, y = NACIONAL), col = "black") +
+  geom_line(data = buffers_ts, aes(x = Date, y = NACIONAL), col = "red2") +
+  geom_point(data = buffers_ts[buffers_ts$WeekDays == "Saturday",], aes(x = Date, y = NACIONAL), col = "dodgerblue") +
+  geom_point(data = buffers_ts[buffers_ts$WeekDays == "Sunday",], aes(x = Date, y = NACIONAL), col = "black") +
   theme_bw()
 
 
 #################################################################################################################################################################################################################################################################################
 ## Contingency Analysis: Logistic Regression ####################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
+
 
 ##
 ## Train / Test
@@ -206,7 +207,6 @@ glm.logit.fit3 <- glm(Result ~ Age.Labels + Gender + WeekDays, family = binomial
 
 anova(glm.logit.fit1, glm.logit.fit2, glm.logit.fit3, glm.logit.fit4, test = "Chisq")
 
-require(pscl)
 list(model1 = pscl::pR2(glm.logit.fit1)["McFadden"],
      model2 = pscl::pR2(glm.logit.fit2)["McFadden"],
      model3 = pscl::pR2(glm.logit.fit3)["McFadden"],
@@ -225,29 +225,30 @@ tmp <- test_set$Result;
 for(i in 1:length(cutoff))
 {
   predicted.classes <- as.factor(ifelse(glm.logit.predict > cutoff[i], "Positive", "Negative")); 
-  tmp2 = confusionMatrix(data = predicted.classes, reference = tmp);
+  tmp2 = confusionMatrix(data = predicted.classes, reference = tmp, positive = "Positive");
   
-  indexes$Sensitivity[i] = tmp2$table[1, 1] / sum(tmp2$table[1, 1:2]);
-  indexes$Specificity[i] = tmp2$table[2, 2] / sum(tmp2$table[2, 1:2]);
-  indexes$Accuracy[i]    = sum(tmp2$table[1, 1], tmp2$table[2, 2]) / sum(tmp2$table[1:2, 1:2]);
+  indexes$Sensitivity[i] = as.numeric(tmp2$byClass[1]);
+  indexes$Specificity[i] = as.numeric(tmp2$byClass[2]);
+  indexes$Accuracy[i]    = as.numeric(tmp2$overall[1]);
+  indexes$Precision[i]   = as.numeric(tmp2$byClass[5]);
 }
 
-indexes$Optimal <- indexes$Sensitivity + indexes$Specificity;
+indexes$Optimal <- indexes$Sensitivity - indexes$Specificity;
   
 ggplot() + 
   
   ## Sensitivity
   geom_line(aes(x = cutoff, y = indexes$Sensitivity), col = "indianred") +
   
-  ## Sensitivity
+  ## Specificity
   geom_line(aes(x = cutoff, y = indexes$Specificity), col = "black") +
   
   ## Accuracy
   geom_line(aes(x = cutoff, y = indexes$Accuracy), col = "dodgerblue") +
            
   ## Cut-off
-  geom_point(aes(x = cutoff[min(which(indexes$Optimal == max(indexes$Optimal, na.rm = TRUE)))], 
-                 y = min(indexes$Sensitivity[which(indexes$Optimal == max(indexes$Optimal, na.rm = TRUE))])), 
+  geom_point(aes(x = cutoff[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))] - 0.003, 
+                 y = indexes$Sensitivity[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))] + 0.006), 
                       col = "black",
                       size = 3) +
            
@@ -260,23 +261,22 @@ ggplot() +
 
   ## Custom Labels
   
-  geom_text(aes(x = 0.82, y = 0.375),  label = "Sensitivity", size = 4) +
+  geom_text(aes(x = 0.80, y = 0.375),  label = "Sensitivity", size = 5) +
   geom_line(aes(x = seq(0.735, 0.765, length = 10), y = rep(0.375, length(seq(0.735, 0.765, length = 10)))), col = "indianred", size = 2) +
   
-  geom_text(aes(x = 0.82, y = 0.35), label = "Accuracy",    size = 4) +
-  geom_line(aes(x = seq(0.735, 0.765, length = 10), y = rep(0.35, length(seq(0.735, 0.765, length = 10)))), col = "dodgerblue", size = 2)
+  geom_text(aes(x = 0.80, y = 0.35), label = "Specificity",    size = 5) +
+  geom_line(aes(x = seq(0.735, 0.765, length = 10), y = rep(0.35, length(seq(0.735, 0.765, length = 10)))), col = "black", size = 2) +
   
-##
-## k-cross-validation
-##
+  geom_text(aes(x = 0.80, y = 0.325), label = "Accuracy",    size = 5) +
+  geom_line(aes(x = seq(0.735, 0.765, length = 10), y = rep(0.325, length(seq(0.735, 0.765, length = 10)))), col = "dodgerblue", size = 2)
 
 ##
 ## Prediction - Aggregated
 ## 
 
 glm.logit.predict <- as.vector(predict(glm.logit.fit4, newdata = test_set, type = "response")); 
-predicted.classes <- as.factor(ifelse(glm.logit.predict > 0.44, "Positive", "Negative")); tmp <- test_set$Result;
-confusionMatrix(data = predicted.classes, reference = tmp);
+predicted.classes <- as.factor(ifelse(glm.logit.predict > cutoff[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))] - 0.003, "Positive", "Negative")); tmp <- test_set$Result;
+confusionMatrix(data = predicted.classes, reference = tmp, positive = "Positive")
 
 ##
 ## Prediction - Daily
@@ -293,17 +293,22 @@ for(i in 1:nrow(dIndex))
   tmp = as.data.frame(test_set %>% filter(test_set$dConfirmed == dIndex[i, 1] & test_set$Region == "Center") %>%
                         select(Age.Labels, Gender, Region, WeekDays, Result, State));
   glm.logit.predict = as.vector(predict(glm.logit.fit4, newdata = tmp[, -5], type = "response")); 
-  tmp2 = as.factor(ifelse(glm.logit.predict > 0.44, "Positive", "Negative"));
+  tmp2 = as.factor(ifelse(glm.logit.predict > cutoff[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))] - 0.003, "Positive", "Negative"));
   dIndex[i, 2] = confusionMatrix(data = tmp2, reference = tmp$Result)$table[2, 2]; 
 }
 
 tmp <- as.data.frame(test_set %>% group_by(dConfirmed) %>% summarise(COUNT = n()))
+
 ggplot() + 
   geom_line(data = tmp, aes(x = dConfirmed, y = COUNT), col = "red2") +
   geom_line(data = dIndex, aes(x = Date, y = Confirmed), col = "black") +
-  theme_bw()
+  
+  ## Custom Label
+  labs(title = "Prediction of daily confirmed cases: Logistic Regression",
+       subtitle = "",
+       x = "Date",
+       y = "Daily Confirmed") +
+  theme_bw(base_size = 15, base_family = "Times")
 
-
-#################################################################################################################################################################################################################################################################################
-## Contingency Analysis: Tree Model #############################################################################################################################################################################################################################################
-#################################################################################################################################################################################################################################################################################
+source("~/TABASCO-MEXCOV-19/src/support/metrica.R")
+metrica(tmp$COUNT, dIndex$Confirmed)
