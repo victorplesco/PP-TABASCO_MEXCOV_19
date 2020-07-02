@@ -16,8 +16,8 @@ Confirmed cases at daily level per region: `ts_confirmed`; Transposed: `trans_ts
 Deaths at daily level per region: `ts_deaths`; Transposed: `trans_ts_deaths` <br/>
 
 **[UPDATED 25/06]** Individual level details per buffer: `buffersraw` <br/>
-**[UPDATED 25/06]** Buffers at daily level per region: `ts_buffers`<br/>
-**[UPDATED 25/06]** Deaths at daily level per region: `new_deaths` <br/>
+**[UPDATED 25/06]** Buffers at daily level per region: `buffers_ts`<br/>
+**[UPDATED 25/06]** Deaths at daily level per region: `deaths_ts` <br/>
 
 Structured data for classification: `dtf_classification` <br/>
 Structured data for regression: `dtf_regression` <br/>
