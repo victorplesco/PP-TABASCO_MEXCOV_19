@@ -23,8 +23,13 @@ pre.merge.deaths <- deaths_ts[, c("Date", "NACIONAL")]
 dtf.class <- merge(dtf.class, pre.merge.deaths, by.x = "dDeaths", by.y = "Date", all.x = TRUE)
 colnames(dtf.class)[colnames(dtf.class) == "NACIONAL"] <- "daily_Deaths";
 
-dtf.class   <- dtf.class[which(dtf.class$dConfirmed <= "2020-06-15"),];
-train_set   <- dtf.class[which(dtf.class$dConfirmed <= "2020-04-18" & dtf.class$dConfirmed > "2020-03-07"),];
-test_set    <- dtf.class[which(dtf.class$dConfirmed > "2020-04-18"),];
+dtf.class   <- dtf.class[which(dtf.class$dConfirmed <= "2020-06-15" & dtf.class$dConfirmed > "2020-03-07"),];
+real_set    <- dtf.class[which(dtf.class$dConfirmed > "2020-04-18"),];
+?sample()
+set.seed(1);
+dtf.class   <- dtf.class[which(dtf.class$dConfirmed <= "2020-04-18"),];
+index       <- sample(1:nrow(dtf.class), nrow(dtf.class) * 0.8, replace = FALSE);
+train_set   <- dtf.class[index,];
+test_set    <- dtf.class[-index,];
 
 rm(buffersraw, dtf.class, deaths_ts, pre.merge.confirmed, pre.merge.deaths, buffers_ts, age_classes, breaks);

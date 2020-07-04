@@ -185,13 +185,13 @@ ggplot() +
 ## Contingency Analysis: Logistic Regression ####################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
-
 ##
 ## Train / Test
 ##
 
 train_set <- train_set[which(train_set$Region == "Center"),]; train_set$State <- droplevels(train_set$State);
 test_set <- test_set[which(test_set$Region == "Center"),]; test_set$State <- droplevels(test_set$State);
+real_set <- real_set[which(real_set$Region == "Center"),]; real_set$State <- droplevels(real_set$State);
 
 ##
 ## glm.logit.fit
@@ -220,8 +220,8 @@ cutoff <- seq(0.01, 1, 0.01);
 indexes <- data.frame(Sensitivity = rep(NA, length(cutoff)),
                       Specificity = rep(NA, length(cutoff)),
                       Accuracy    = rep(NA, length(cutoff)))
-glm.logit.predict <- as.vector(predict(glm.logit.fit4, newdata = test_set, type = "response")); 
-tmp <- test_set$Result;
+glm.logit.predict <- as.vector(predict(glm.logit.fit4, newdata = train_set, type = "response")); 
+tmp <- train_set$Result;
 for(i in 1:length(cutoff))
 {
   predicted.classes <- as.factor(ifelse(glm.logit.predict > cutoff[i], "Positive", "Negative")); 
@@ -247,8 +247,8 @@ ggplot() +
   geom_line(aes(x = cutoff, y = indexes$Accuracy), col = "dodgerblue") +
            
   ## Cut-off
-  geom_point(aes(x = cutoff[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))] - 0.003, 
-                 y = indexes$Sensitivity[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))] + 0.006), 
+  geom_point(aes(x = cutoff[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))] + 0.005, 
+                 y = indexes$Sensitivity[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))] - 0.006), 
                       col = "black",
                       size = 3) +
            
@@ -261,13 +261,13 @@ ggplot() +
 
   ## Custom Labels
   
-  geom_text(aes(x = 0.80, y = 0.375),  label = "Sensitivity", size = 5) +
+  geom_text(aes(x = 0.83, y = 0.375),  label = "Sensitivity", size = 5) +
   geom_line(aes(x = seq(0.735, 0.765, length = 10), y = rep(0.375, length(seq(0.735, 0.765, length = 10)))), col = "indianred", size = 2) +
   
-  geom_text(aes(x = 0.80, y = 0.35), label = "Specificity",    size = 5) +
+  geom_text(aes(x = 0.83, y = 0.35), label = "Specificity",    size = 5) +
   geom_line(aes(x = seq(0.735, 0.765, length = 10), y = rep(0.35, length(seq(0.735, 0.765, length = 10)))), col = "black", size = 2) +
   
-  geom_text(aes(x = 0.80, y = 0.325), label = "Accuracy",    size = 5) +
+  geom_text(aes(x = 0.83, y = 0.325), label = "Accuracy",    size = 5) +
   geom_line(aes(x = seq(0.735, 0.765, length = 10), y = rep(0.325, length(seq(0.735, 0.765, length = 10)))), col = "dodgerblue", size = 2)
 
 ##
@@ -275,11 +275,11 @@ ggplot() +
 ## 
 
 glm.logit.predict <- as.vector(predict(glm.logit.fit4, newdata = test_set, type = "response")); 
-predicted.classes <- as.factor(ifelse(glm.logit.predict > cutoff[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))] - 0.003, "Positive", "Negative")); tmp <- test_set$Result;
+predicted.classes <- as.factor(ifelse(glm.logit.predict > cutoff[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))], "Positive", "Negative")); tmp <- test_set$Result;
 confusionMatrix(data = predicted.classes, reference = tmp, positive = "Positive")
 
 ##
-## Prediction - Daily
+## Prediction - Daily - Test
 ##
 
 dIndex <- data.frame(Date = unique(test_set$dConfirmed),
@@ -298,6 +298,43 @@ for(i in 1:nrow(dIndex))
 }
 
 tmp <- as.data.frame(test_set %>% group_by(dConfirmed) %>% summarise(COUNT = n()))
+
+
+ggplot() + 
+  geom_line(data = tmp, aes(x = dConfirmed, y = COUNT), col = "red2") +
+  geom_line(data = dIndex, aes(x = Date, y = Confirmed), col = "black") +
+  
+  ## Custom Label
+  labs(title = "Prediction of daily confirmed cases: Logistic Regression",
+       subtitle = "",
+       x = "Date",
+       y = "Daily Confirmed") +
+  theme_bw(base_size = 15, base_family = "Times")
+
+source("~/TABASCO-MEXCOV-19/src/support/metrica.R")
+metrica(tmp$COUNT, dIndex$Confirmed)
+
+##
+## Prediction - Daily - Real
+##
+
+dIndex <- data.frame(Date = unique(real_set$dConfirmed),
+                     Confirmed = rep(NA, length(unique(real_set$dConfirmed))))
+minDate <- c()
+for(i in 1:nrow(dIndex)) {minDate[i] = min(which(real_set$dConfirmed == dIndex[i, 1]))}
+maxDate <- c()
+for(i in 1:nrow(dIndex)) {maxDate[i] = max(which(real_set$dConfirmed == dIndex[i, 1]))}
+for(i in 1:nrow(dIndex))
+{
+  tmp = as.data.frame(real_set %>% filter(real_set$dConfirmed == dIndex[i, 1] & real_set$Region == "Center") %>%
+                        select(Age.Labels, Gender, Region, WeekDays, Result, State));
+  glm.logit.predict = as.vector(predict(glm.logit.fit4, newdata = tmp[, -5], type = "response")); 
+  tmp2 = as.factor(ifelse(glm.logit.predict > cutoff[which(abs(indexes$Optimal) == min(abs(indexes$Optimal), na.rm = TRUE))] - 0.003, "Positive", "Negative"));
+  dIndex[i, 2] = confusionMatrix(data = tmp2, reference = tmp$Result)$table[2, 2]; 
+}
+
+tmp <- as.data.frame(real_set %>% group_by(dConfirmed) %>% summarise(COUNT = n()))
+
 
 ggplot() + 
   geom_line(data = tmp, aes(x = dConfirmed, y = COUNT), col = "red2") +
