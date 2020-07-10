@@ -14,20 +14,14 @@ The COVID-19 pandemic in Mexico is part of the ongoing worldwide pandemic of cor
 **[UPDATED 25/06]** Buffers at daily level per region: `buffers_ts`<br/>
 **[UPDATED 25/06]** Deaths at daily level per region: `deaths_ts` <br/>
 
-**[UPDATED 18/04]** Population at state level: `population` <br/>
-**[UPDATED 18/04]** Estimated demographics based on census 2010: `demographics_2020e` <br/>
-**[UPDATED 18/04]** Estimated population based on census 2010: `population_2020e` <br/>
-
 Structured data for classification: `dtf_classification` <br/>
 Structured data for regression: `dtf_regression` <br/>
-Structured data for ARIMA: `dtf_arima` <br/>
-
 
 **Notes**
 
 From your R script run
 
- 1. `source("~/TABASCO-MEXCOV-19/src/packages/autoinstall.R")` to install/update and require used packages <br/>
+ 1. `source("~/TABASCO-MEXCOV-19/src/packages/install-packages.R")` to install/update and require used packages <br/>
  2. `source("~/TABASCO-MEXCOV-19/src/cleansing/<DATASET_NAME>.R")` to gather specific dataset <br/>
 
 
