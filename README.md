@@ -6,14 +6,10 @@
 
 **Context**
 
-Coronaviruses are a large family of viruses which may cause illness in animals or humans. In humans, several coronaviruses are known to cause respiratory infections ranging from the common cold to more severe diseases such as Middle East Respiratory Syndrome (MERS) and Severe Acute Respiratory Syndrome (SARS). The most recently discovered coronavirus is COVID-19 - World Health Organization. The number of new cases are increasing day by day around the world. This dataset has information from the states of Mexico at daily level.
-
+The COVID-19 pandemic in Mexico is part of the ongoing worldwide pandemic of coronavirus disease 2019 (COVID-19) caused by severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2). The virus was confirmed to have reached Mexico in February 2020. However, the National Council of Science and Technology (CONACYT) reported two cases of COVID-19 in mid-January 2020 in the states of Nayarit and Tabasco, one case per state. As of July 9, there had been 282,283 confirmed cases of COVID-19 in Mexico and 33,526 reported deaths.
 **Content**
 
-Population at state level: `population` <br/>
-Individual level details per confirmed case: `confirmedraw` <br/>
-Confirmed cases at daily level per region: `ts_confirmed`; Transposed: `trans_ts_confirmed` <br/>
-Deaths at daily level per region: `ts_deaths`; Transposed: `trans_ts_deaths` <br/>
+**[UPDATED 18/04]** Population at state level: `population` <br/>
 
 **[UPDATED 25/06]** Individual level details per buffer: `buffersraw` <br/>
 **[UPDATED 25/06]** Buffers at daily level per region: `buffers_ts`<br/>
@@ -36,18 +32,7 @@ From your R script run
 
 **Project Links**
 
-  1. [Kaggle: COVID-19 Mexico](https://www.kaggle.com/carloslira/covid19-mexico)
-  2. [Data source: github/carloscerlira](https://github.com/carloscerlira/COVIDMX/tree/master)
-  3. [Gobierno de Mexico](https://www.gob.mx/salud/documentos/datos-abiertos-152127)
- 
-**Extra Links**
- 
-  1. [COVID-19 pandemic in Mexico](https://en.wikipedia.org/wiki/COVID-19_pandemic_in_Mexico)
-  2. [Demographics of Mexico](https://en.wikipedia.org/wiki/Demographics_of_Mexico#Demographic_dynamics)
-  3. [Real-time data (COVID-19)](https://www.google.com/search?sxsrf=ALeKk02Ayqjbn8ehNTAxQcjuA1NRcY_hHg%3A1592899181787&ei=bbbxXoTZL8fergSl1aD4Dw&q=mexico+covid+&oq=mexico+covid+&gs_lcp=CgZwc3ktYWIQAzIECCMQJzIECCMQJzIGCCMQJxATMgIIADIFCAAQywEyAggAMgUIABDLATIFCAAQywEyBQgAEMsBMgUIABDLAToGCAAQFhAeUJocWNEoYLEqaABwAHgAgAHPAYgBswiSAQU3LjIuMZgBAKABAaoBB2d3cy13aXo&sclient=psy-ab&ved=0ahUKEwjEw5Lvu5fqAhVHr4sKHaUqCP8Q4dUDCAw&uact=5#wptab=s:H4sIAAAAAAAAAONgVuLVT9c3NMwySk6OL8zJecTYxMgt8PLHPWGpyklrTl5jLOYS901NyUzOzEt1ySxOTSxO9clPTizJzM8T0uNic80rySypFFLhEpRCNUeDQYqfC1VISIOLA65XhotXilM_V98gydIgvgiompsLweXZxcTtkZqYU5IRXJJYUryIVQpEZxaXZCZnpCoUlyo45xfl5yWWZRaVFgMAVJFaHsIAAAA)
-  
-**ARIMA**
- 
-  1. [Kaggle: The Story of COVID-19 in India EDA and Prediction](https://www.kaggle.com/nitishabharathi/the-story-of-covid-19-in-india-eda-and-prediction#Prediction-)
-  2. [ARIMA in R](https://otexts.com/fpp2/arima-r.html) 
-  3. [Using R for Time Series Analysis](https://a-little-book-of-r-for-time-series.readthedocs.io/en/latest/src/timeseries.html)
+  1. [Gobierno de Mexico](https://www.gob.mx/salud/documentos/datos-abiertos-152127)
+  2. [COVID-19 pandemic in Mexico](https://en.wikipedia.org/wiki/COVID-19_pandemic_in_Mexico)
+  3. [Demographics of Mexico](https://en.wikipedia.org/wiki/Demographics_of_Mexico#Demographic_dynamics)
+  4. [Real-time data (COVID-19)](https://www.google.com/search?sxsrf=ALeKk02Ayqjbn8ehNTAxQcjuA1NRcY_hHg%3A1592899181787&ei=bbbxXoTZL8fergSl1aD4Dw&q=mexico+covid+&oq=mexico+covid+&gs_lcp=CgZwc3ktYWIQAzIECCMQJzIECCMQJzIGCCMQJxATMgIIADIFCAAQywEyAggAMgUIABDLATIFCAAQywEyBQgAEMsBMgUIABDLAToGCAAQFhAeUJocWNEoYLEqaABwAHgAgAHPAYgBswiSAQU3LjIuMZgBAKABAaoBB2d3cy13aXo&sclient=psy-ab&ved=0ahUKEwjEw5Lvu5fqAhVHr4sKHaUqCP8Q4dUDCAw&uact=5#wptab=s:H4sIAAAAAAAAAONgVuLVT9c3NMwySk6OL8zJecTYxMgt8PLHPWGpyklrTl5jLOYS901NyUzOzEt1ySxOTSxO9clPTizJzM8T0uNic80rySypFFLhEpRCNUeDQYqfC1VISIOLA65XhotXilM_V98gydIgvgiompsLweXZxcTtkZqYU5IRXJJYUryIVQpEZxaXZCZnpCoUlyo45xfl5yWWZRaVFgMAVJFaHsIAAAA)
