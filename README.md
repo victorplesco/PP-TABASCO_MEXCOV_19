@@ -7,6 +7,7 @@
 **Context**
 
 The COVID-19 pandemic in Mexico is part of the ongoing worldwide pandemic of coronavirus disease 2019 (COVID-19) caused by severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2). The virus was confirmed to have reached Mexico in February 2020. However, the National Council of Science and Technology (CONACYT) reported two cases of COVID-19 in mid-January 2020 in the states of Nayarit and Tabasco, one case per state. As of July 9, there had been 282,283 confirmed cases of COVID-19 in Mexico and 33,526 reported deaths.
+
 **Content**
 
 **[UPDATED 18/04]** Population at state level: `population` <br/>
