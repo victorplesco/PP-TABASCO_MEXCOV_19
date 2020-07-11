@@ -10,7 +10,7 @@ The COVID-19 pandemic in Mexico is part of the ongoing worldwide pandemic of cor
 
 **Content**
 
-**[UPDATED 09/07]** Individual level details per swab: `buffersraw` <br/>
+**[UPDATED 09/07]** Individual level details per swab: `swabsraw` <br/>
 
 Structured data for classification: `dtf_classification` <br/>
 Structured data for regression: `dtf_regression` <br/>
