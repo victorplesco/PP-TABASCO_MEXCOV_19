@@ -12,8 +12,13 @@ for(i in pkg)
 mex <- read.csv(unzip("~/TABASCO-MEXCOV-19/data/original/datos_abiertos_covid19.zip"))
 # str(mex)
 
-# select();
-swabsraw <- as.data.frame(mex %>% select(
+##
+## select();
+##
+
+swabsraw <- as.data.frame(mex %>% 
+                            
+  select(
   
   # PRIMARY KEY;
   ID_REGISTRO, # <ID> 
@@ -52,7 +57,7 @@ swabsraw <- as.data.frame(mex %>% select(
   FECHA_SINTOMAS, 
   FECHA_DEF
   
-) %>% 
+  ) %>% 
   
   filter(RESULTADO != "3")) # Not considering the "pending" results of the SARS-CoV-2 screen test;
 

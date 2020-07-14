@@ -29,7 +29,7 @@ raw_interval <- function(n, direction, x)
   raw_interval(n, majorname, major)
 }
 
-breaks <- sort(unique(as.vector(t(raw_interval(n, "start", buffersraw$Age)[, -1]))));
+breaks <- sort(unique(as.vector(t(raw_interval(n, "start", swabspos$EDAD)[, -1]))));
 age_classes <- c(rep(NA, length(breaks) - 1));
 for(i in 1:(length(breaks)-1)) 
 {
