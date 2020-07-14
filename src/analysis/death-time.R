@@ -2,7 +2,7 @@ source("~/TABASCO-MEXCOV-19/src/cleansing/swabsraw.R")
 defaultW <- getOption("warn") 
 options(warn = -1) 
 
-dtf <- as.data.frame(swabsraw %>% filter(RESULTADO == "Positive"));
+dtf <- as.data.frame(swabsraw_07-09 %>% filter(RESULTADO == "Positive"));
 time_of_death <- as.numeric(dtf$FECHA_DEF - dtf$FECHA_SINTOMAS); time_of_death <- time_of_death[-which(is.na(time_of_death))];
 
 n <- length(time_of_death); B <- 10^4; mean_vect <- rep(0, B)
@@ -21,4 +21,4 @@ abline(v = mean(time_of_death) + c( 1) * 2.58 * SE_boot_mean, col = "dodgerblue3
 abline(v = quantile(mean_vect, 0.99), col = "tomato3", lwd = 3, lty = 2);
 
 options(warn = defaultW)
-rm(dtf, swabsraw, B, i, ind, mean_vect, n, SE_boot_mean, time_of_death, defaultW);
+rm(dtf, swabsraw_07-09, B, i, ind, mean_vect, n, SE_boot_mean, time_of_death, defaultW);
