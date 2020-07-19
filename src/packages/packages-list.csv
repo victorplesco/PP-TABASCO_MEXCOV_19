@@ -3,3 +3,9 @@ tidyverse
 caret
 ggplot2
 gridExtra
+rstanarm
+DescTools
+vcd
+reshape2
+ggalt
+ggridges
