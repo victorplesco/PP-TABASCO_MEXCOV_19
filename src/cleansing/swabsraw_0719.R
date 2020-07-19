@@ -9,7 +9,7 @@ for(i in pkg)
   else {library(as.character(i), character.only = TRUE);}
 };
 
-mex <- read.csv(unzip("~/TABASCO-MEXCOV-19/data/original_0709/datos_abiertos_covid19.zip"))
+mex <- read.csv(unzip("~/TABASCO-MEXCOV-19/data/original_0719/datos_abiertos_covid19.zip"))
 # str(mex)
 
 ##
