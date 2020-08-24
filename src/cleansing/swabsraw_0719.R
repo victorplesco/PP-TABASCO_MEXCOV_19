@@ -172,4 +172,4 @@ swabsraw$FALLECIDO[which(is.na(swabsraw[, tmp[3]]) == TRUE)] <- "No"; swabsraw$F
 swabsraw$FALLECIDO <- factor(swabsraw$FALLECIDO, levels = c("No", "Yes"));
 rm(entidas, mex, i, ind, pkg, tmp);
 
-write.csv(swabsraw, file = gzfile("~/TABASCO-MEXCOV-19/data/preprocessed/0719/swabsraw_0719.csv.gz"), row.names = FALSE);
+write.csv(swabsraw, file = gzfile("~/TABASCO-MEXCOV-19/data/cleansed/0719/swabsraw_0719.csv.gz"), row.names = FALSE);
