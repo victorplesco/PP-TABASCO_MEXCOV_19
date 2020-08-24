@@ -28,7 +28,6 @@ From your R script run
 
  * `source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R")` | to **install** and/or **require** used packages. <br/>
  * `source("~/TABASCO-MEXCOV-19/src/cleansing/<DATASET_NAME>.R")` &nbsp; | to **preprocess** a specific dataset. <br/>
- * `source("~/TABASCO-MEXCOV-19/data/preprocessed/<MONTH><DAY>/<DATASET_NAME>.R")` &nbsp; | to **load** a specific dataset. <br/>
 
 <h2>
   Project Links
