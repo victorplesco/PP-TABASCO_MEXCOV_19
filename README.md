@@ -26,7 +26,7 @@ The COVID-19 pandemic in Mexico is part of the ongoing worldwide pandemic of cor
 From your R script run
 
  1. `source("~/TABASCO-MEXCOV-19/src/packages/install-packages.R")` to install and/or require used packages <br/>
- 2. `source("~/TABASCO-MEXCOV-19/src/cleansing/<DATASET_NAME>.R")` \\ to gather specific dataset <br/>
+ 2. `source("~/TABASCO-MEXCOV-19/src/cleansing/<DATASET_NAME>.R")` to gather specific dataset <br/>
 
 <h2>
   Project Links
