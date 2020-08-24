@@ -9,7 +9,7 @@ for(i in pkg)
   else {library(as.character(i), character.only = TRUE);}
 };
 
-mex <- read.csv(unzip("~/TABASCO-MEXCOV-19/data/original_0719/datos_abiertos_covid19.zip"))
+mex <- read.csv(unzip("~/TABASCO-MEXCOV-19/data/original/0719/datos_abiertos_covid19.zip"))
 # str(mex)
 
 ##
@@ -80,7 +80,7 @@ swabsraw$SEXO[ind] <- NA; swabsraw$SEXO <- droplevels(swabsraw$SEXO);
 ## 
 
 # [NEW VALUE]: STATE <> ENTIDAD_UM - Consult "Catalogo_de_Entidas_2020.csv";
-entidas <- read.csv("~/TABASCO-MEXCOV-19/data/metadata/Catalogo_de_Entidas_2020.csv", header = TRUE); 
+entidas <- read.csv("~/TABASCO-MEXCOV-19/data/metadata/catalogo_de_entidas_2020.csv", header = TRUE); 
 ind <- which(swabsraw$ENTIDAD_UM %in% entidas$CLAVE_ENTIDAD[1:32]);
 swabsraw <- merge(x = swabsraw, y = entidas, by.x = "ENTIDAD_UM", by.y = "CLAVE_ENTIDAD", all.x = TRUE);
 swabsraw$ENTIDAD_FEDERATIVA[-ind] <- NA; swabsraw$ENTIDAD_FEDERATIVA <- droplevels(swabsraw$ENTIDAD_FEDERATIVA);
@@ -166,8 +166,10 @@ swabsraw[, tmp[1]] <- as.Date(as.character(swabsraw[, tmp[1]]), format = "%Y-%m-
 swabsraw[, tmp[2]] <- as.Date(as.character(swabsraw[, tmp[2]]), format = "%Y-%m-%d")
 swabsraw[, tmp[3]] <- as.Date(na_if(as.character(swabsraw[, tmp[3]]), "9999-99-99"), format = "%Y-%m-%d")
 
-# [NEW COLUMN]: DECEASED = Yes (is.na(FECHA_DEF) == FALSE), No (is.na(FECHA_DEF) == TRUE);
-swabsraw$DECEASED <- NA;
-swabsraw$DECEASED[which(is.na(swabsraw[, tmp[3]]) == TRUE)] <- "No"; swabsraw$DECEASED[which(is.na(swabsraw[, tmp[3]]) == FALSE)] <- "Yes"; 
-swabsraw$DECEASED <- factor(swabsraw$DECEASED, levels = c("No", "Yes"));
+# [NEW COLUMN]: DECEASED <> FALLECIDO = Yes (is.na(FECHA_DEF) == FALSE), No (is.na(FECHA_DEF) == TRUE);
+swabsraw$FALLECIDO <- NA;
+swabsraw$FALLECIDO[which(is.na(swabsraw[, tmp[3]]) == TRUE)] <- "No"; swabsraw$FALLECIDO[which(is.na(swabsraw[, tmp[3]]) == FALSE)] <- "Yes"; 
+swabsraw$FALLECIDO <- factor(swabsraw$FALLECIDO, levels = c("No", "Yes"));
 rm(entidas, mex, i, ind, pkg, tmp);
+
+write.csv(swabsraw, file = gzfile("~/TABASCO-MEXCOV-19/data/preprocessed/0719/swabsraw_0719.csv.gz"), row.names = FALSE);

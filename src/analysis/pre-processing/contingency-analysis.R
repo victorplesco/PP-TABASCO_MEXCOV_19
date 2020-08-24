@@ -1,17 +1,17 @@
 source("~/TABASCO-MEXCOV-19/src/packages/install-packages.R")
 source("~/TABASCO-MEXCOV-19/src/cleansing/swabsraw_0719.R")
 
+# defaultW <- getOption("warn") 
+# options(warn = -1) 
+# options(warn = defaultW)
+
 swabspos <- as.data.frame(swabsraw %>% filter(RESULTADO == "Positive") %>%
                             mutate(INFECTION_TIME = as.numeric(as.Date("2020-07-18") - FECHA_SINTOMAS))); # Time being infected. After 26d we estimate recovering.
-ind      <- which(swabspos$DECEASED == "No" & swabspos$INFECTION_TIME <= 26); swabspos <- swabspos[-ind,];                                                
+ind      <- which(swabspos$FALLECIDO == "No" & swabspos$INFECTION_TIME <= 26); swabspos <- swabspos[-ind,];                                                
 swabspos <- as.data.frame(swabspos %>% select(-c(ID_REGISTRO, NEUMONIA, OTRO_CASO, INFECTION_TIME, ENTIDAD_UM, FECHA_INGRESO, FECHA_SINTOMAS, FECHA_DEF, RESULTADO, TIPO_PACIENTE, UCI, INTUBADO))); rm(ind);
 
 #################################################################################################################################################################################################################################################################################
-## Contingency Analysis: Independence ###########################################################################################################################################################################################################################################
-#################################################################################################################################################################################################################################################################################
-
-#################################################################################################################################################################################################################################################################################
-## Categorical                                                                                                                                                                                                                                                                 ##
+## Categorical ##################################################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
 indipmatrix <- matrix(0, nrow = (ncol(swabspos) - 1), ncol = (ncol(swabspos) - 1));
@@ -25,7 +25,7 @@ findindex <- function(vector, x)
   return(indexes);
 };
 
-tmp <- tmp[findindex(tmp, c("DECEASED", "SEXO", "EMBARAZO", "DIABETES", "EPOC", "ASMA", "INMUSUPR", "HIPERTENSION", "CARDIOVASCULAR", "OBESIDAD", "RENAL_CRONICA", "TABAQUISMO"))];
+tmp <- tmp[findindex(tmp, c("FALLECIDO", "SEXO", "EMBARAZO", "DIABETES", "EPOC", "ASMA", "INMUSUPR", "HIPERTENSION", "CARDIOVASCULAR", "OBESIDAD", "RENAL_CRONICA", "TABAQUISMO"))];
 colnames(indipmatrix) <- tmp; rownames(indipmatrix) <- tmp; rm(tmp, findindex);
 
 for(i in 1:nrow(indipmatrix))
@@ -55,7 +55,7 @@ findindex <- function(vector, x)
   return(indexes);
 };
 
-tmp <- tmp[findindex(tmp, c("DECEASED", "SEXO", "EMBARAZO", "DIABETES", "EPOC", "ASMA", "INMUSUPR", "HIPERTENSION", "CARDIOVASCULAR", "OBESIDAD", "RENAL_CRONICA", "TABAQUISMO"))];
+tmp <- tmp[findindex(tmp, c("FALLECIDO", "SEXO", "EMBARAZO", "DIABETES", "EPOC", "ASMA", "INMUSUPR", "HIPERTENSION", "CARDIOVASCULAR", "OBESIDAD", "RENAL_CRONICA", "TABAQUISMO"))];
 colnames(assocmatrix) <- tmp; rownames(assocmatrix) <- tmp; rm(tmp, findindex);
 
 for(i in 1:nrow(assocmatrix))
@@ -76,6 +76,7 @@ for(i in 1:nrow(assocmatrix))
 
 indipData <- melt(indipmatrix); colnames(indipData)[3] <- "p-value"; 
 assocData <- melt(assocmatrix); colnames(assocData)[3] <- "Cramer's V";
+
 ggplot(data = indipData, aes(x = Var1, y = Var2)) + 
   
   geom_raster(data = indipData, aes(fill = indipData[, 3])) + 
@@ -84,13 +85,14 @@ ggplot(data = indipData, aes(x = Var1, y = Var2)) +
   geom_point(data = assocData, aes(size = assocData[, 3]),
              color = "black") +
   
-  # geom_text(data = indipData, aes(label = round(as.numeric(assocData[, 3]), 2))) +
   scale_size(range = c(0, 10)) +
   
-  # geom_point(data = enc_deceased, aes(x = Var1, y = Var2, size = enc_deceased[, 3]), 
-  #            color = "dodgerblue3") +
-  
-  guides(size = guide_legend(override.aes = list(colour = "black"))) + 
+  # TEXT Solution;
+  # geom_text(data = indipData, aes(label = round(as.numeric(assocData[, 3]), 2))) + 
+
+  # COLOR Solution;
+  # geom_point(...  )
+  # guides(size = guide_legend(override.aes = list(colour = "black"))) + 
 
   ## Custom Label
   labs(title = "",
@@ -101,24 +103,24 @@ ggplot(data = indipData, aes(x = Var1, y = Var2)) +
   labs(fill = "p-value", size = "Cramer's V");
 
 #################################################################################################################################################################################################################################################################################
-## Numerical                                                                                                                                                                                                                                                                   ##
+## Numerical ####################################################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
-ggplot(data = swabspos, aes(x = DECEASED, y = EDAD)) +
-  geom_boxplot(aes(col = DECEASED), fill = "white") + 
+ggplot(data = swabspos, aes(x = FALLECIDO, y = EDAD)) +
+  geom_boxplot(aes(col = FALLECIDO), fill = "white") + 
   scale_color_manual(values = c("black", "tomato3")) +
   
   # Custom Label
   labs(title = "",
        subtitle = "",
-       x = "Result",
-       y = "Age") +
+       x = "FALLECIDO",
+       y = "EDAD") +
   theme_bw(base_size = 15, base_family = "Times") +
   theme(legend.position = "top");
 
-par(mfrow = c(1, 2));
-qqnorm(swabspos$EDAD[swabspos$DECEASED == "Yes"], sub = "DECEASED | Yes"); qqline(swabspos$EDAD[swabspos$DECEASED == "Yes"], col = "tomato3");
-qqnorm(swabspos$EDAD[swabspos$DECEASED == "No"], sub = "DECEASED | No"); qqline(swabspos$EDAD[swabspos$DECEASED == "No"], col = "dodgerblue3");
-par(mfrow = c(1, 1));
+# par(mfrow = c(1, 2));
+# qqnorm(swabspos$EDAD[swabspos$FALLECIDO == "Yes"], sub = "FALLECIDO | Yes"); qqline(swabspos$EDAD[swabspos$FALLECIDO == "Yes"], col = "tomato3");
+# qqnorm(swabspos$EDAD[swabspos$FALLECIDO == "No"], sub = "FALLECIDO | No"); qqline(swabspos$EDAD[swabspos$FALLECIDO == "No"], col = "dodgerblue3");
+# par(mfrow = c(1, 1));
 
-t.test(EDAD ~ DECEASED, data = swabspos, var.equal = FALSE)
+t.test(EDAD ~ FALLECIDO, data = swabspos, var.equal = FALSE)

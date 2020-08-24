@@ -1,15 +1,15 @@
 source("~/TABASCO-MEXCOV-19/src/packages/install-packages.R")
 source("~/TABASCO-MEXCOV-19/src/cleansing/swabsraw_0719.R")
     
-##########################################################################################################################################################################################################################################################
-## Logit - DECEASED ######################################################################################################################################################################################################################################
-##########################################################################################################################################################################################################################################################
-
 swabspos <- as.data.frame(swabsraw %>% filter(RESULTADO == "Positive") %>%
-                                       mutate(INFECTION_TIME = as.numeric(as.Date("2020-07-18") - FECHA_SINTOMAS))); # Time being infected. After 12d we estimate recovering.
-ind      <- which(swabspos$DECEASED == "No" & swabspos$INFECTION_TIME <= 26); swabspos <- swabspos[-ind,];                                                
+                            mutate(INFECTION_TIME = as.numeric(as.Date("2020-07-18") - FECHA_SINTOMAS))); # Time being infected. After 12d we estimate recovering.
+ind      <- which(swabspos$FALLECIDO == "No" & swabspos$INFECTION_TIME <= 26); swabspos <- swabspos[-ind,];                                                
 swabspos <- as.data.frame(swabspos %>% select(-c(ID_REGISTRO, NEUMONIA, EMBARAZO, OTRO_CASO, INFECTION_TIME, ENTIDAD_UM, FECHA_INGRESO, FECHA_SINTOMAS, FECHA_DEF, RESULTADO, TIPO_PACIENTE, UCI, INTUBADO))); rm(ind);
 swabspos <- na.omit(swabspos); # summary(swabspos);
+
+##########################################################################################################################################################################################################################################################
+## Logit - FALLECIDO ######################################################################################################################################################################################################################################
+##########################################################################################################################################################################################################################################################
 
 ##
 ## train & test set;
@@ -41,13 +41,13 @@ for(j in 1:5)
     {
       if(variables[i] == 0) {next;};
       
-      glm.logit.fit = glm(DECEASED ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[j]], c(index, variables[i], 13)], na.action = na.omit);
+      glm.logit.fit = glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[j]], c(index, variables[i], 13)], na.action = na.omit);
       dev[i] = (-2 * as.numeric(logLik(glm.logit.fit))) # Deviance;
       
       if(i == 12)
       {
         tmp = which(dev == min(dev, na.rm = TRUE)); index[k] <- tmp; variables[tmp] <- 0;
-        glm.logit.fit = glm(DECEASED ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[j]], c(index, 13)], na.action = na.omit);
+        glm.logit.fit = glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[j]], c(index, 13)], na.action = na.omit);
         
         PARAMETERS[k, j] = tmp;
         DEVIANCE[k, j] = (-2 * as.numeric(logLik(glm.logit.fit))) # Deviance;
@@ -71,17 +71,17 @@ rownames(AIC)        <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", 
 rownames(BIC)        <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12");
 rownames(Pseudo_R)   <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12");
 
-# write_csv(as.data.frame(PARAMETERS), "~/TABASCO-MEXCOV-19/src/analysis/deceased-logit/freq-cv/PARAMETERS.csv")
-# write_csv(as.data.frame(DEVIANCE),   "~/TABASCO-MEXCOV-19/src/analysis/deceased-logit/freq-cv/DEVIANCE.csv"  )
-# write_csv(as.data.frame(AIC),        "~/TABASCO-MEXCOV-19/src/analysis/deceased-logit/freq-cv/AIC.csv"       )
-# write_csv(as.data.frame(BIC),        "~/TABASCO-MEXCOV-19/src/analysis/deceased-logit/freq-cv/BIC.csv"       )
-# write_csv(as.data.frame(Pseudo_R),   "~/TABASCO-MEXCOV-19/src/analysis/deceased-logit/freq-cv/Pseudo_R.csv"  )
+# write_csv(as.data.frame(PARAMETERS), "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/PARAMETERS.csv")
+# write_csv(as.data.frame(DEVIANCE),   "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/DEVIANCE.csv"  )
+# write_csv(as.data.frame(AIC),        "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/AIC.csv"       )
+# write_csv(as.data.frame(BIC),        "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/BIC.csv"       )
+# write_csv(as.data.frame(Pseudo_R),   "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/Pseudo_R.csv"  )
 
-# PARAMETERS <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/deceased-logit/freq-cv/PARAMETERS.csv")
-# DEVIANCE   <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/deceased-logit/freq-cv/DEVIANCE.csv"  )
-# AIC        <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/deceased-logit/freq-cv/AIC.csv"       )
-# BIC        <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/deceased-logit/freq-cv/BIC.csv"       )
-# Pseudo_R   <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/deceased-logit/freq-cv/Pseudo_R.csv"  )
+# PARAMETERS <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/PARAMETERS.csv")
+# DEVIANCE   <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/DEVIANCE.csv"  )
+# AIC        <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/AIC.csv"       )
+# BIC        <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/BIC.csv"       )
+# Pseudo_R   <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/Pseudo_R.csv"  )
 
 summary_cv <- data.frame(Complexity = c(1:12),
                          DEVIANCE   = as.numeric(apply(X = DEVIANCE, MARGIN = 1, FUN = mean)),
@@ -112,7 +112,7 @@ for(k in 1:10)
   iterator = 1; index = c(1, 2, 4, 3, 11);
   for(i in 1:5)
   {
-    glm.logit.fit     = glm(DECEASED ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[k]], c(index[1:iterator], 13)], na.action = na.omit);
+    glm.logit.fit     = glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[k]], c(index[1:iterator], 13)], na.action = na.omit);
     glm.logit.predict = as.vector(predict(glm.logit.fit, newdata = swabspos[flds[[k]], c(index[1:iterator], 13)], type = "response")); 
     CROSSENTROPY[i, k] = cross_entropy(ifelse(swabspos[flds[[k]], c(13)] == "Yes", 1, 0), glm.logit.predict, length(swabspos[flds[[1]], c(13)]));  
     
@@ -139,9 +139,9 @@ tmp[[1]]; tmp[[2]];
 ## Prediction - Aggregated
 ## 
 
-glm.logit.fit     <- glm(DECEASED ~ ., family = binomial(link = "logit"), data = swabspos[flds[[3]], c(2, 3, 13)], na.action = na.omit);
+glm.logit.fit     <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[flds[[3]], c(2, 3, 13)], na.action = na.omit);
 glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = na.omit(swabspos[-flds[[3]], c(2, 3, 13)]), type = "response")); 
-predicted.classes <- as.factor(ifelse(glm.logit.predict > 0.5, "Yes", "No")); tmp <- na.omit(swabspos[-flds[[3]], c(2, 3, 13)])$DECEASED;
+predicted.classes <- as.factor(ifelse(glm.logit.predict > 0.5, "Yes", "No")); tmp <- na.omit(swabspos[-flds[[3]], c(2, 3, 13)])$FALLECIDO;
 confusionMatrix(data = predicted.classes, reference = tmp, positive = "Yes")
 
 ##########################################################################################################################################################################################################################################################
@@ -166,7 +166,7 @@ rm(.Random.seed, envir=globalenv()); rm(ind);
 ## glm.logit.fit
 ##
 
-glm.logit.fit <- glm(DECEASED ~ ., family = binomial(link = "logit"), data = train_set[, -4], na.action = na.omit);
+glm.logit.fit <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = train_set[, -4], na.action = na.omit);
 summary(glm.logit.fit);
 anova(glm.logit.fit, test = "Chisq");
 pscl::pR2(glm.logit.fit)["McFadden"];
@@ -185,7 +185,7 @@ tmp[[1]]; tmp[[2]];
 ## 
 
 glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = test_set, type = "response")); 
-predicted.classes <- as.factor(ifelse(glm.logit.predict > tmp[[2]], "Yes", "No")); tmp <- test_set$DECEASED;
+predicted.classes <- as.factor(ifelse(glm.logit.predict > tmp[[2]], "Yes", "No")); tmp <- test_set$FALLECIDO;
 confusionMatrix(data = predicted.classes, reference = tmp, positive = "Yes")
 
 ##########################################################################################################################################################################################################################################################
@@ -210,7 +210,7 @@ rm(.Random.seed, envir=globalenv()); rm(ind);
 ## glm.logit.fit
 ##
 
-glm.logit.fit <- glm(DECEASED ~ ., family = binomial(link = "logit"), data = train_set[, -4], na.action = na.omit);
+glm.logit.fit <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = train_set[, -4], na.action = na.omit);
 summary(glm.logit.fit);
 anova(glm.logit.fit, test = "Chisq");
 pscl::pR2(glm.logit.fit)["McFadden"];
@@ -229,7 +229,7 @@ tmp[[1]]; tmp[[2]];
 ## 
 
 glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = test_set, type = "response")); 
-predicted.classes <- as.factor(ifelse(glm.logit.predict > tmp[[2]], "Yes", "No")); tmp <- test_set$DECEASED;
+predicted.classes <- as.factor(ifelse(glm.logit.predict > tmp[[2]], "Yes", "No")); tmp <- test_set$FALLECIDO;
 confusionMatrix(data = predicted.classes, reference = tmp, positive = "Yes")
 
 ##########################################################################################################################################################################################################################################################

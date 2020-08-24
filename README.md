@@ -16,8 +16,8 @@ The COVID-19 pandemic in Mexico is part of the ongoing worldwide pandemic of cor
   Content
 </h2>
 
-**[UPDATED 07/19]** | Individual level details per swab: `swabsraw_0719` <br/>
-**[UPDATED 08/23]** | Individual level details per swab: `swabsraw_0823` <br/>
+Individual level details per swab: `swabsraw_0719` <br/>
+Individual level details per swab: `swabsraw_0823` <br/>
 
 <h2>
   Notes
@@ -25,7 +25,7 @@ The COVID-19 pandemic in Mexico is part of the ongoing worldwide pandemic of cor
 
 From your R script run
 
- * `source("~/TABASCO-MEXCOV-19/src/packages/install-packages.R")` | to **install** and/or **require** used packages. <br/>
+ * `source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R")` | to **install** and/or **require** used packages. <br/>
  * `source("~/TABASCO-MEXCOV-19/src/cleansing/<DATASET_NAME>.R")` &nbsp; | to **load** specific dataset. <br/>
 
 <h2>
