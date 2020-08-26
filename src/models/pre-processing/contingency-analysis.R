@@ -1,4 +1,4 @@
-source("~/TABASCO-MEXCOV-19/src/packages/install-packages.R")
+source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R")
 source("~/TABASCO-MEXCOV-19/src/cleansing/swabsraw_0719.R")
 
 # defaultW <- getOption("warn") 
@@ -6,7 +6,7 @@ source("~/TABASCO-MEXCOV-19/src/cleansing/swabsraw_0719.R")
 # options(warn = defaultW)
 
 swabspos <- as.data.frame(swabsraw %>% filter(RESULTADO == "Positive") %>%
-                            mutate(INFECTION_TIME = as.numeric(as.Date("2020-07-18") - FECHA_SINTOMAS))); # Time being infected. After 26d we estimate recovering.
+                                       mutate(INFECTION_TIME = as.numeric(as.Date("2020-07-18") - FECHA_SINTOMAS))); # Time being infected. After 26d we estimate recovering.
 ind      <- which(swabspos$FALLECIDO == "No" & swabspos$INFECTION_TIME <= 26); swabspos <- swabspos[-ind,];                                                
 swabspos <- as.data.frame(swabspos %>% select(-c(ID_REGISTRO, NEUMONIA, OTRO_CASO, INFECTION_TIME, ENTIDAD_UM, FECHA_INGRESO, FECHA_SINTOMAS, FECHA_DEF, RESULTADO, TIPO_PACIENTE, UCI, INTUBADO))); rm(ind);
 
@@ -123,4 +123,4 @@ ggplot(data = swabspos, aes(x = FALLECIDO, y = EDAD)) +
 # qqnorm(swabspos$EDAD[swabspos$FALLECIDO == "No"], sub = "FALLECIDO | No"); qqline(swabspos$EDAD[swabspos$FALLECIDO == "No"], col = "dodgerblue3");
 # par(mfrow = c(1, 1));
 
-t.test(EDAD ~ FALLECIDO, data = swabspos, var.equal = FALSE)
+t.test(EDAD ~ FALLECIDO, data = swabspos, var.equal = FALSE);

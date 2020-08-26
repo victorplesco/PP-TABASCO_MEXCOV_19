@@ -10,3 +10,5 @@ reshape2
 ggalt
 ggridges
 naniar
+fitdistrplus
+logspline
