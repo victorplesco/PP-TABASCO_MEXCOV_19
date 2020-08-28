@@ -1,20 +1,10 @@
-pkg <- c("tidyverse");
-for(i in pkg) 
-{
-  if(!require(as.character(i), character.only = TRUE))
-  {
-    install.packages(as.character(i), character.only = TRUE)
-    library(as.character(i), character.only = TRUE)
-  }
-  else {library(as.character(i), character.only = TRUE);}
-};
+source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R");
+mex <- read.csv(unzip("~/TABASCO-MEXCOV-19/data/original/0718/datos_abiertos_covid19.zip"));
+# str(mex);
 
-mex <- read.csv(unzip("~/TABASCO-MEXCOV-19/data/original/0718/datos_abiertos_covid19.zip"))
-# str(mex)
-
-##
-## select();
-##
+#################################################################################################################################################################################################################################################################################
+## Cleansing ####################################################################################################################################################################################################################################################################
+#################################################################################################################################################################################################################################################################################
 
 swabsraw <- as.data.frame(mex %>% 
                             
@@ -168,6 +158,6 @@ swabsraw[, tmp[3]] <- as.Date(na_if(as.character(swabsraw[, tmp[3]]), "9999-99-9
 swabsraw$FALLECIDO <- NA;
 swabsraw$FALLECIDO[which(is.na(swabsraw[, tmp[3]]) == TRUE)] <- "No"; swabsraw$FALLECIDO[which(is.na(swabsraw[, tmp[3]]) == FALSE)] <- "Yes"; 
 swabsraw$FALLECIDO <- factor(swabsraw$FALLECIDO, levels = c("No", "Yes"));
-rm(entidas, mex, i, ind, pkg, tmp);
+rm(entidas, mex, i, ind, tmp);
 
 write.csv(swabsraw, file = gzfile("~/TABASCO-MEXCOV-19/data/cleansed/0718/swabsraw_0718.csv.gz"), row.names = FALSE);

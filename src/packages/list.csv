@@ -1,7 +1,7 @@
 package
+fitdistrplus
 tidyverse
 caret
-ggplot2
 gridExtra
 rstanarm
 DescTools
@@ -10,5 +10,4 @@ reshape2
 ggalt
 ggridges
 naniar
-fitdistrplus
 logspline

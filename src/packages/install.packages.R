@@ -4,8 +4,7 @@ for(i in 1:nrow(list))
 {
   if(!require(list[i, 1], character.only = TRUE))
   {
-    install.packages(as.character(list[i, 1]), character.only = TRUE)
-    library(as.character(list[i, 1]), character.only = TRUE)
+    install.packages(as.character(list[i, 1]), character.only = TRUE);
+    library(as.character(list[i, 1]), character.only = TRUE);
   }
-}
-rm(i, list)
+}; rm(i, list);

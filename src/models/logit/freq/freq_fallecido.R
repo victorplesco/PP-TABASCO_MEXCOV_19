@@ -12,68 +12,56 @@ swabspos <- na.omit(swabspos); # summary(swabspos);
 #################################################################################################################################################################################################################################################################################
 
 set.seed(123);
-flds <- createFolds(as.numeric(rownames(swabspos)), k = 5, list = TRUE, returnTrain = FALSE)
+flds <- createFolds(as.numeric(rownames(swabspos)), k = 10, list = TRUE, returnTrain = FALSE)
 
 #################################################################################################################################################################################################################################################################################
 ## Model Fit ####################################################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
-PARAMETERS    <- matrix(0, nrow = 12, ncol = 10);
-DEVIANCE      <- matrix(0, nrow = 12, ncol = 10);
-AIC           <- matrix(0, nrow = 12, ncol = 10);
-BIC           <- matrix(0, nrow = 12, ncol = 10);
+rnms <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11");
+cnms <- c("K1", "K2", "K3", "K4", "K5");
 
-for(j in 1:5)
-{
-  index <- c();
+indices <- lapply(X = list(PARAMETERS = matrix(0, nrow = 11, ncol = 5),
+                           DEVIANCE   = matrix(0, nrow = 11, ncol = 5),
+                           AIC        = matrix(0, nrow = 11, ncol = 5),
+                           BIC        = matrix(0, nrow = 11, ncol = 5),
+                           CHI        = matrix(0, nrow = 11, ncol = 5)),
+                  FUN = function(x){rownames(x) = rnms; colnames(x) = cnms; x;}); rm(rnms, cnms);
 
-  for(k in 1:12)
-  {
-    dev = c(); variables = c(1:12); 
-
-    for(i in 1:12)
-    {
-      if(variables[i] == 0) {next;};
-      
-      glm.logit.fit = glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[j]], c(index, variables[i], 12)], na.action = na.omit);
-      dev[i] = (-2 * as.numeric(logLik(glm.logit.fit))) # Deviance;
-      
-      if(i == 12)
-      {
-        tmp = which(dev == min(dev, na.rm = TRUE)); index[k] <- tmp; variables[tmp] <- 0;
-        glm.logit.fit = glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[j]], c(index, 12)], na.action = na.omit);
-        
-        PARAMETERS[k, j] = tmp;
-        DEVIANCE[k, j] = (-2 * as.numeric(logLik(glm.logit.fit))) # Deviance;
-        AIC[k, j]      = ( 2 * length(glm.logit.fit$coefficients)) + (-2 * as.numeric(logLik(glm.logit.fit))) # AIC;
-        BIC[k, j]      = (log(length(flds[[1]])) * length(glm.logit.fit$coefficients)) + (-2 * as.numeric(logLik(glm.logit.fit))) # BIC;
-      }
-    }
-  }
-};
+for(i in 1:5)
+{index = c(); variables = c(1:11); cat(paste0("K-", i), "Cross Validation\n");
   
-colnames(PARAMETERS) <- c("K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10");
-colnames(DEVIANCE)   <- c("K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10");
-colnames(AIC)        <- c("K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10");
-colnames(BIC)        <- c("K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10");
-colnames(Pseudo_R)   <- c("K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10");
+  for(j in 1:11)
+  {dev = c(); cat(paste0(" j-", j), " \n");
+  
+    for(k in 1:11)
+    {if(variables[11] != 0) {if(variables[k] == 0){next;}}
 
-rownames(PARAMETERS) <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12");
-rownames(DEVIANCE)   <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12");
-rownames(AIC)        <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12");
-rownames(BIC)        <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12");
-rownames(Pseudo_R)   <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12");
+      cat(paste0("   k-", k), " \n");
+      glm.logit.fit = glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[i]], c(as.numeric(na.omit(index)), variables[k], 12)], na.action = na.omit);
+      dev[k] = (-2 * as.numeric(logLik(glm.logit.fit))) # Key for variables selection;
+      
+      cat("    ", dev, "\n");
+      if(k == 11)
+      {
+        if(j == 1){prior.glm.fit = glm(FALLECIDO ~ 1, family = binomial(link = "logit"), data = swabspos[-flds[[i]],], na.action = na.omit);}
+        else{prior.glm.fit = glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[i]], c(as.numeric(na.omit(index)), 12)], na.action = na.omit);}
+        tmp = which(dev == min(dev, na.rm = TRUE)); index[j] = tmp; variables[tmp] = 0;
+        glm.logit.fit = glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[i]], c(as.numeric(na.omit(index)), 12)], na.action = na.omit);
+        
+        indices$PARAMETERS[j, i] = tmp;
+        indices$DEVIANCE[j, i]   = (-2 * as.numeric(logLik(glm.logit.fit))); # Deviance;
+        indices$AIC[j, i]        = ( 2 * length(glm.logit.fit$coefficients)) + (-2 * as.numeric(logLik(glm.logit.fit))); # AIC;
+        indices$BIC[j, i]        = (log(length(flds[[i]])) * length(glm.logit.fit$coefficients)) + (-2 * as.numeric(logLik(glm.logit.fit))); # BIC;
+        indices$CHI[j, i]        = -2 * (as.numeric(logLik(prior.glm.fit) - as.numeric(logLik(glm.logit.fit)))); # CHI;
+        
+        cat(" variables: ", variables, "\n", "index: ", index, "\n", "tmp: ", tmp, "\n");
+      }
+    };
+  };
+};
 
-# write_csv(as.data.frame(PARAMETERS), "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/PARAMETERS.csv")
-# write_csv(as.data.frame(DEVIANCE),   "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/DEVIANCE.csv"  )
-# write_csv(as.data.frame(AIC),        "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/AIC.csv"       )
-# write_csv(as.data.frame(BIC),        "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/BIC.csv"       )
 # write_csv(as.data.frame(Pseudo_R),   "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/Pseudo_R.csv"  )
-
-# PARAMETERS <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/PARAMETERS.csv")
-# DEVIANCE   <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/DEVIANCE.csv"  )
-# AIC        <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/AIC.csv"       )
-# BIC        <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/BIC.csv"       )
 # Pseudo_R   <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/Pseudo_R.csv"  )
 
 summary_cv <- data.frame(Complexity = c(1:12),
