@@ -18,7 +18,7 @@ The COVID-19 pandemic in Mexico is part of the ongoing worldwide pandemic of cor
 
 Individual level details per swab: <br/>
  * `swabsraw_0709` | until 09/07/2020
- * `swabsraw_0719` | until 19/07/2020
+ * `swabsraw_0718` | until 18/07/2020
 
 <h2>
   Notes
