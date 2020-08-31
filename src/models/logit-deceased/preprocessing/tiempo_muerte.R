@@ -18,13 +18,6 @@ descdist(TIEMPO_MUERTE, boot = 100, discrete = FALSE);
 fit.lognorm <- fitdist(TIEMPO_MUERTE, "lnorm", method = c("mge"));
 fit.weibull <- fitdist(TIEMPO_MUERTE, "weibull", method = c("mse"));
 
-
-exp(fit.lognorm$estimate[1] + fit.lognorm$estimate[2]^2/2)
-hist(log(TIEMPO_MUERTE))
-hist(TIEMPO_MUERTE)
-mean(log(TIEMPO_MUERTE))
-
-
 ggplot() +
   
   # TIEMPO_MUERTE;

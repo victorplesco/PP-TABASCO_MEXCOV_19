@@ -12,3 +12,4 @@ ggridges
 naniar
 logspline
 kableExtra
+data.table
