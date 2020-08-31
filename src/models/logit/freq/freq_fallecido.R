@@ -3,19 +3,19 @@ source("~/TABASCO-MEXCOV-19/src/cleansing/swabsraw_0718.R")
     
 swabspos <- as.data.frame(swabsraw %>% filter(RESULTADO == "Positive") %>%
                                        mutate(TIEMPO_INFECCION = as.numeric(as.Date("2020-07-18") - FECHA_SINTOMAS))); # Time being infected; 
-ind      <- which(swabspos$FALLECIDO == "No" & swabspos$TIEMPO_INFECCION <= 40); swabspos <- swabspos[-ind,]; # After 40d we estimate recovering;                                                
-swabspos <- as.data.frame(swabspos %>% select(-c(ID_REGISTRO, NEUMONIA, EMBARAZO, OTRO_CASO, TIEMPO_INFECCION, ENTIDAD_UM, FECHA_INGRESO, FECHA_SINTOMAS, FECHA_DEF, RESULTADO, TIPO_PACIENTE, UCI, INTUBADO))); rm(ind);
+ind      <- which(swabspos$TIEMPO_INFECCION <= 40); swabspos <- swabspos[-ind,]; # After 40d we estimate recovering;                                                
+swabspos <- as.data.frame(swabspos %>% select(-c(ID_REGISTRO, EMBARAZO, NEUMONIA, OTRO_CASO, ENTIDAD_UM, FECHA_INGRESO, FECHA_SINTOMAS, FECHA_DEF, RESULTADO, TIPO_PACIENTE, UCI, INTUBADO, TIEMPO_INFECCION))); rm(ind, swabsraw);
 swabspos <- na.omit(swabspos); # summary(swabspos);
 
 #################################################################################################################################################################################################################################################################################
-## K-Fold Cross Validation ######################################################################################################################################################################################################################################################
+## 5-fold Cross Validation ######################################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
 set.seed(123);
-flds <- createFolds(as.numeric(rownames(swabspos)), k = 10, list = TRUE, returnTrain = FALSE)
+flds <- createFolds(as.numeric(rownames(swabspos)), k = 5, list = TRUE, returnTrain = FALSE);
 
 #################################################################################################################################################################################################################################################################################
-## Model Fit ####################################################################################################################################################################################################################################################################
+## Model Selection - Training Data ##############################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
 rnms <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11");
@@ -25,7 +25,8 @@ indices <- lapply(X = list(PARAMETERS = matrix(0, nrow = 11, ncol = 5),
                            DEVIANCE   = matrix(0, nrow = 11, ncol = 5),
                            AIC        = matrix(0, nrow = 11, ncol = 5),
                            BIC        = matrix(0, nrow = 11, ncol = 5),
-                           CHI        = matrix(0, nrow = 11, ncol = 5)),
+                           LRT        = matrix(0, nrow = 11, ncol = 5),
+                           WALD       = matrix(0, nrow = 11, ncol = 5)),
                   FUN = function(x){rownames(x) = rnms; colnames(x) = cnms; x;}); rm(rnms, cnms);
 
 for(i in 1:5)
@@ -51,185 +52,232 @@ for(i in 1:5)
         
         indices$PARAMETERS[j, i] = tmp;
         indices$DEVIANCE[j, i]   = (-2 * as.numeric(logLik(glm.logit.fit))); # Deviance;
-        indices$AIC[j, i]        = ( 2 * length(glm.logit.fit$coefficients)) + (-2 * as.numeric(logLik(glm.logit.fit))); # AIC;
+        indices$AIC[j, i]        = (2 * length(glm.logit.fit$coefficients)) + (-2 * as.numeric(logLik(glm.logit.fit))); # AIC;
         indices$BIC[j, i]        = (log(length(flds[[i]])) * length(glm.logit.fit$coefficients)) + (-2 * as.numeric(logLik(glm.logit.fit))); # BIC;
-        indices$CHI[j, i]        = -2 * (as.numeric(logLik(prior.glm.fit) - as.numeric(logLik(glm.logit.fit)))); # CHI;
+        indices$LRT[j, i]        = pchisq(-2 * (as.numeric(logLik(prior.glm.fit) - as.numeric(logLik(glm.logit.fit)))), 1, lower.tail = FALSE); # Likelihood Ratio Test;
+        indices$WALD[j, i]       = pnorm(as.numeric(glm.logit.fit$coefficients[j + 1])/sqrt(summary(glm.logit.fit)$cov.scaled[j + 1, j + 1]), 0, 1, lower.tail = FALSE); # Wald Test;
         
         cat(" variables: ", variables, "\n", "index: ", index, "\n", "tmp: ", tmp, "\n");
-      }
+      } 
     };
   };
-};
+}; rm(glm.logit.fit, dev, i, index, j, k, variables);
 
-# write_csv(as.data.frame(Pseudo_R),   "~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/Pseudo_R.csv"  )
-# Pseudo_R   <- read_csv("~/TABASCO-MEXCOV-19/src/analysis/FALLECIDO-logit/freq-cv/Pseudo_R.csv"  )
+# saveRDS(indices, "~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/training_indices.rds"); rm(indices);
+training_indices <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/training_indices.rds");
 
-summary_cv <- data.frame(Complexity = c(1:12),
-                         DEVIANCE   = as.numeric(apply(X = DEVIANCE, MARGIN = 1, FUN = mean)),
-                         AIC        = as.numeric(apply(X = AIC, MARGIN = 1, FUN = mean)),
-                         BIC        = as.numeric(apply(X = BIC, MARGIN = 1, FUN = mean)),
-                         Pseudo_R   = as.numeric(apply(X = Pseudo_R, MARGIN = 1, FUN = mean)));
+ggplot() +
+  
+  # 5-fold CV Deviance;
+  geom_line(aes(x = c(1:11), y = apply(X = training_indices$DEVIANCE, MARGIN = 1, FUN = mean)),
+            col = "black",
+            size = 0.75) +
+  
+  # 5-fold CV Max/Min;
+  geom_ribbon(aes(x = c(1:11),
+                  ymin = apply(X = training_indices$DEVIANCE, MARGIN = 1, FUN = min), 
+                  ymax = apply(X = training_indices$DEVIANCE, MARGIN = 1, FUN = max)), 
+              alpha    = 0.1,
+              linetype = "dashed",
+              colour   = "black",
+              size     = 0.75,
+              fill     = "tomato3") +
+  
+  # Custom Labels;
+  labs(title = "5-fold CV",
+       subtitle = "",
+       x = "Complexity",
+       y = "Deviance") +
+  theme_bw(base_size = 17.5, base_family = "Times");
 
-par(mfrow = c(2, 2));
-plot(summary_cv$Complexity, summary_cv$DEVIANCE, type = "l", col = "tomato3", lwd = 2, xlab = "Complexity", ylab = "Deviance");
-plot(summary_cv$Complexity, summary_cv$AIC, type = "l", col = "tomato3", lwd = 2, xlab = "Complexity", ylab = "AIC");
-plot(summary_cv$Complexity, summary_cv$BIC, type = "l", col = "tomato3", lwd = 2, xlab = "Complexity", ylab = "BIC");
-plot(summary_cv$Complexity, summary_cv$Pseudo_R, type = "l", col = "tomato3", lwd = 2, xlab = "Complexity", ylab = "Pseudo-R");
+#################################################################################################################################################################################################################################################################################
+## Model Selection - Testing Data ###############################################################################################################################################################################################################################################
+#################################################################################################################################################################################################################################################################################
 
-##
-## test-error;
-##
+source("~/TABASCO-MEXCOV-19/src/support/confmatrix.R");
 
-cross_entropy <- function(y, y_hat, N)
-{return(-1/N * sum(y * log(y_hat) + (1 - y) * log(1 - y_hat)));}
+rnms <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11");
+cnms <- c("K1", "K2", "K3", "K4", "K5");
 
-CROSSENTROPY <- matrix(0, nrow = 5, ncol = 10);
-# https://towardsdatascience.com/entropy-how-decision-trees-make-decisions-2946b9c18c8
-# https://towardsdatascience.com/cross-entropy-for-dummies-5189303c7735
-# WHY ADDING COVARIATES IS DANNOSO?
+indices <- lapply(X = list(CUTOFF      = matrix(0, nrow = 11, ncol = 5),
+                           SENSITIVITY = matrix(0, nrow = 11, ncol = 5),
+                           SPECIFICITY = matrix(0, nrow = 11, ncol = 5),
+                           ACCURACY    = matrix(0, nrow = 11, ncol = 5)),
+                  FUN = function(x){rownames(x) = rnms; colnames(x) = cnms; x;}); rm(rnms, cnms);
 
-for(k in 1:10)
-{
-  iterator = 1; index = c(1, 2, 4, 3, 11);
-  for(i in 1:5)
-  {
-    glm.logit.fit     = glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[k]], c(index[1:iterator], 13)], na.action = na.omit);
-    glm.logit.predict = as.vector(predict(glm.logit.fit, newdata = swabspos[flds[[k]], c(index[1:iterator], 13)], type = "response")); 
-    CROSSENTROPY[i, k] = cross_entropy(ifelse(swabspos[flds[[k]], c(13)] == "Yes", 1, 0), glm.logit.predict, length(swabspos[flds[[1]], c(13)]));  
+for(i in 1:5)
+{cat(paste0("K-", i), "Cross Validation\n");
+
+  for(j in 1:11)
+  {cat(paste0(" j-", j), " \n");
     
-    iterator = iterator + 1;
-  }
+    glm.model = glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[-flds[[i]], c(training_indices$PARAMETERS[1:j, i], 12)], na.action = na.omit);
+    test.set  = swabspos[-flds[[i]], training_indices$PARAMETERS[1:j, i], drop = FALSE]; 
+    target    = swabspos[-flds[[i]], 12];
+    tmp       = confmatrix(test.set, target, glm.model, show.plot = FALSE);
+    
+    indices$CUTOFF[j, i]      = tmp$Cutoff;
+    indices$SENSITIVITY[j, i] = tmp$Sensitivity;
+    indices$SPECIFICITY[j, i] = tmp$Specificity;
+    indices$ACCURACY[j, i]    = tmp$Accuracy;
+  };
+}; rm(flds, glm.model, test.set, training_indices, i, j, target, "confmatrix");
+
+# saveRDS(indices, "~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/test_error.rds"); rm(indices);
+test_error <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/test_error.rds");
+
+# saveRDS(indices, "~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/train_error.rds"); rm(indices);
+train_error <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/train_error.rds");
+
+# Complexity Vs (Cutoff, Accuracy, Sensitivity, Specificity) on TRAIN and TEST sets;
+{
+cut.plot <- ggplot() +
+  
+  # 5-fold CV Cutoff;
+  geom_line(aes(x = c(1:11), y = apply(X = test_error$CUTOFF, MARGIN = 1, FUN = mean)),
+            col = "black",
+            size = 0.75) +
+  geom_line(aes(x = c(1:11), y = apply(X = train_error$CUTOFF, MARGIN = 1, FUN = mean)),
+            col = "tomato3",
+            size = 0.75) +
+  
+  geom_ribbon(aes(x = c(1:11),
+                  ymin = apply(X = test_error$CUTOFF, MARGIN = 1, FUN = min), 
+                  ymax = apply(X = test_error$CUTOFF, MARGIN = 1, FUN = max)), 
+              alpha    = 0.1,
+              linetype = "dashed",
+              colour   = "black",
+              size     = 0.75,
+              fill     = "black") +
+  geom_ribbon(aes(x = c(1:11),
+                  ymin = apply(X = train_error$CUTOFF, MARGIN = 1, FUN = min), 
+                  ymax = apply(X = train_error$CUTOFF, MARGIN = 1, FUN = max)), 
+              alpha    = 0.1,
+              linetype = "dashed",
+              colour   = "tomato3",
+              size     = 0.75,
+              fill     = "tomato3") +
+  
+  # Custom Labels;
+  labs(title = "",
+       subtitle = "",
+       x = "Complexity",
+       y = "Cutoff") +
+  theme_bw(base_size = 17.5, base_family = "Times");
+
+acc.plot <- ggplot() +
+  
+  # 5-fold CV Accuracy;
+  geom_line(aes(x = c(1:11), y = apply(X = test_error$ACCURACY, MARGIN = 1, FUN = mean)),
+            col = "black",
+            size = 0.75) +
+  geom_line(aes(x = c(1:11), y = apply(X = train_error$ACCURACY, MARGIN = 1, FUN = mean)),
+            col = "tomato3",
+            size = 0.75) +
+  
+  geom_ribbon(aes(x = c(1:11),
+                  ymin = apply(X = test_error$ACCURACY, MARGIN = 1, FUN = min), 
+                  ymax = apply(X = test_error$ACCURACY, MARGIN = 1, FUN = max)), 
+              alpha    = 0.1,
+              linetype = "dashed",
+              colour   = "black",
+              size     = 0.75,
+              fill     = "black") +
+  geom_ribbon(aes(x = c(1:11),
+                  ymin = apply(X = train_error$ACCURACY, MARGIN = 1, FUN = min), 
+                  ymax = apply(X = train_error$ACCURACY, MARGIN = 1, FUN = max)), 
+              alpha    = 0.1,
+              linetype = "dashed",
+              colour   = "tomato3",
+              size     = 0.75,
+              fill     = "tomato3") +
+  
+  # Custom Labels;
+  labs(title = "",
+       subtitle = "",
+       x = "Complexity",
+       y = "Accuracy") +
+  theme_bw(base_size = 17.5, base_family = "Times");
+
+sen.plot <- ggplot() +
+  
+  # 5-fold CV Sensitivity;
+  geom_line(aes(x = c(1:11), y = apply(X = test_error$SENSITIVITY, MARGIN = 1, FUN = mean)),
+            col = "black",
+            size = 0.75) +
+  geom_line(aes(x = c(1:11), y = apply(X = train_error$SENSITIVITY, MARGIN = 1, FUN = mean)),
+            col = "tomato3",
+            size = 0.75) +
+  
+  geom_ribbon(aes(x = c(1:11),
+                  ymin = apply(X = test_error$SENSITIVITY, MARGIN = 1, FUN = min), 
+                  ymax = apply(X = test_error$SENSITIVITY, MARGIN = 1, FUN = max)), 
+              alpha    = 0.1,
+              linetype = "dashed",
+              colour   = "black",
+              size     = 0.75,
+              fill     = "black") +
+  geom_ribbon(aes(x = c(1:11),
+                  ymin = apply(X = train_error$SENSITIVITY, MARGIN = 1, FUN = min), 
+                  ymax = apply(X = train_error$SENSITIVITY, MARGIN = 1, FUN = max)), 
+              alpha    = 0.1,
+              linetype = "dashed",
+              colour   = "tomato3",
+              size     = 0.75,
+              fill     = "tomato3") +
+  
+  # Custom Labels;
+  labs(title = "",
+       subtitle = "",
+       x = "Complexity",
+       y = "Sensitivity") +
+  theme_bw(base_size = 17.5, base_family = "Times");
+
+spe.plot <- ggplot() +
+  
+  # 5-fold CV Specificity;
+  geom_line(aes(x = c(1:11), y = apply(X = test_error$SPECIFICITY, MARGIN = 1, FUN = mean)),
+            col = "black",
+            size = 0.75) +
+  geom_line(aes(x = c(1:11), y = apply(X = train_error$SPECIFICITY, MARGIN = 1, FUN = mean)),
+            col = "tomato3",
+            size = 0.75) +
+  
+  geom_ribbon(aes(x = c(1:11),
+                  ymin = apply(X = test_error$SPECIFICITY, MARGIN = 1, FUN = min), 
+                  ymax = apply(X = test_error$SPECIFICITY, MARGIN = 1, FUN = max)), 
+              alpha    = 0.1,
+              linetype = "dashed",
+              colour   = "black",
+              size     = 0.75,
+              fill     = "black") +
+  geom_ribbon(aes(x = c(1:11),
+                  ymin = apply(X = train_error$SPECIFICITY, MARGIN = 1, FUN = min), 
+                  ymax = apply(X = train_error$SPECIFICITY, MARGIN = 1, FUN = max)), 
+              alpha    = 0.1,
+              linetype = "dashed",
+              colour   = "tomato3",
+              size     = 0.75,
+              fill     = "tomato3") +
+  
+  # Custom Labels;
+  labs(title = "",
+       subtitle = "",
+       x = "Complexity",
+       y = "Specificty") +
+  theme_bw(base_size = 17.5, base_family = "Times");
+
+grid.arrange(cut.plot, acc.plot, sen.plot, spe.plot, nrow = 2); rm(acc.plot, cut.plot, sen.plot, spe.plot, test_error, train_error);
 }
 
-colnames(CROSSENTROPY) <- c("K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10");
-rownames(CROSSENTROPY) <- c("V1", "V2", "V3", "V4", "V5");
+# Visualization of the chosen cutoff;
 
-par(mfrow = c(1, 1));
-plot(1:5, as.numeric(apply(X = CROSSENTROPY, MARGIN = 1, FUN = mean)), type = "l", col = "tomato3", lwd = 2, xlab = "Complexity", ylab = "Cross-Entropy");
+#################################################################################################################################################################################################################################################################################
+## Final Model ##################################################################################################################################################################################################################################################################
+#################################################################################################################################################################################################################################################################################
 
-##
-## confusion-matrix;
-##
-  
-targe * log(predizione  )
-source("~/TABASCO-MEXCOV-19/src/support/confmatrix.R")
-tmp <- confmatrix(train_set, glm.logit.fit)
-tmp[[1]]; tmp[[2]];
-  
-##
-## Prediction - Aggregated
-## 
+glm.logit.fit     <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[, -c(5, 8, 11)], na.action = na.omit);
+glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = swabspos, type = "response")); 
+predicted.classes <- factor(ifelse(glm.logit.predict > 0.1614469, "Yes", "No"), levels = c("Yes", "No")); target <- factor(swabspos$FALLECIDO, levels = c("Yes", "No"));
+confusionMatrix(data = predicted.classes, reference = target, positive = "Yes");
 
-glm.logit.fit     <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[flds[[3]], c(2, 3, 13)], na.action = na.omit);
-glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = na.omit(swabspos[-flds[[3]], c(2, 3, 13)]), type = "response")); 
-predicted.classes <- as.factor(ifelse(glm.logit.predict > 0.5, "Yes", "No")); tmp <- na.omit(swabspos[-flds[[3]], c(2, 3, 13)])$FALLECIDO;
-confusionMatrix(data = predicted.classes, reference = tmp, positive = "Yes")
-
-##########################################################################################################################################################################################################################################################
-## SEXO: Male ############################################################################################################################################################################################################################################
-##########################################################################################################################################################################################################################################################
-
-swabspos_male <- as.data.frame(swabspos %>% filter(SEXO == "Male") %>%
-                                            select(-c(SEXO, EMBARAZO)));
-# summary(swabspos_male)
-
-##
-## Train & Test Set;
-##
-
-set.seed(123);
-ind <- sample(1:nrow(swabspos_male), 0.8 * nrow(swabspos_male), replace = FALSE);
-train_set <- swabspos_male[ind,]; test_set <- swabspos_male[-ind,];
-# summary(train_set)
-rm(.Random.seed, envir=globalenv()); rm(ind);
-
-##
-## glm.logit.fit
-##
-
-glm.logit.fit <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = train_set[, -4], na.action = na.omit);
-summary(glm.logit.fit);
-anova(glm.logit.fit, test = "Chisq");
-pscl::pR2(glm.logit.fit)["McFadden"];
-# mCoef <- glm.logit.fit$coefficients;
-
-##
-## confusion-matrix
-##
-
-source("~/TABASCO-MEXCOV-19/src/support/confmatrix.R")
-tmp <- confmatrix(train_set, glm.logit.fit)
-tmp[[1]]; tmp[[2]];
-
-##
-## Prediction - Aggregated
-## 
-
-glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = test_set, type = "response")); 
-predicted.classes <- as.factor(ifelse(glm.logit.predict > tmp[[2]], "Yes", "No")); tmp <- test_set$FALLECIDO;
-confusionMatrix(data = predicted.classes, reference = tmp, positive = "Yes")
-
-##########################################################################################################################################################################################################################################################
-## SEXO: Female ##########################################################################################################################################################################################################################################
-##########################################################################################################################################################################################################################################################
-
-swabspos_female <- as.data.frame(swabspos %>% filter(SEXO == "Female") %>%
-                                              select(-SEXO));
-# summary(swabspos_female)
-
-##
-## Train & Test Set;
-##
-
-set.seed(123);
-ind <- sample(1:nrow(swabspos_female), 0.8 * nrow(swabspos_female), replace = FALSE);
-train_set <- swabspos_female[ind,]; test_set <- swabspos_female[-ind,];
-# summary(train_set)
-rm(.Random.seed, envir=globalenv()); rm(ind);
-
-##
-## glm.logit.fit
-##
-
-glm.logit.fit <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = train_set[, -4], na.action = na.omit);
-summary(glm.logit.fit);
-anova(glm.logit.fit, test = "Chisq");
-pscl::pR2(glm.logit.fit)["McFadden"];
-# fCoef <- glm.logit.fit$coefficients;
-
-##
-## confusion-matrix
-##
-
-source("~/TABASCO-MEXCOV-19/src/support/confmatrix.R")
-tmp <- confmatrix(train_set, glm.logit.fit)
-tmp[[1]]; tmp[[2]];
-
-##
-## Prediction - Aggregated
-## 
-
-glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = test_set, type = "response")); 
-predicted.classes <- as.factor(ifelse(glm.logit.predict > tmp[[2]], "Yes", "No")); tmp <- test_set$FALLECIDO;
-confusionMatrix(data = predicted.classes, reference = tmp, positive = "Yes")
-
-##########################################################################################################################################################################################################################################################
-## RESULTs ###############################################################################################################################################################################################################################################
-##########################################################################################################################################################################################################################################################
-
-SEXOS <- ggplot() +
-  
-  geom_line(aes(x = 1:length(tCoef), y = as.numeric(tCoef)), col = "black") +
-  geom_line(aes(x = 1:length(mCoef), y = as.numeric(mCoef)), col = "dodgerblue3") +
-  geom_line(aes(x = 1:length(fCoef), y = as.numeric(fCoef)), col = "tomato3") +
-  
-  ## Custom Label
-  labs(title = "Prediction of daily confirmed cases: Logistic Regression",
-       subtitle = "",
-       x = "Date",
-       y = "Daily Confirmed") +
-  theme_bw(base_size = 12, base_family = "Times") +
-  
-  scale_x_continuous(breaks = c(1:length(tCoef)), 
-                     labels = names(tCoef))
-  
