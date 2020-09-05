@@ -15,47 +15,41 @@ mle.fit <- fitdist(TIEMPO_MUERTE, "lnorm", method = c("mle")); mle <- c(mle.fit$
 mme.fit <- fitdist(TIEMPO_MUERTE, "lnorm", method = c("mme")); mme <- c(mme.fit$estimate[1], mme.fit$estimate[2]); 
 mge.fit <- fitdist(TIEMPO_MUERTE, "lnorm", method = c("mge")); mge <- c(mge.fit$estimate[1], mge.fit$estimate[2]); 
 mse.fit <- fitdist(TIEMPO_MUERTE, "lnorm", method = c("mse")); mse <- c(mse.fit$estimate[1], mse.fit$estimate[2]); 
+plnorm(TIEMPO_MUERTE, mle.fit$estimate[1], mle.fit$estimate[2])
+plnorm(TIEMPO_MUERTE, mme.fit$estimate[1], mme.fit$estimate[2])
 
-plot_dtf <- data.frame(x     = sort(unique(TIEMPO_MUERTE)),
-                       CDF   = c(cumsum(as.numeric(table(TIEMPO_MUERTE)))/sum(as.numeric(table(TIEMPO_MUERTE))),
-                                 cumsum(dlnorm(unique(TIEMPO_MUERTE), mle.fit$estimate[1], mle.fit$estimate[2])),
-                                 cumsum(dlnorm(unique(TIEMPO_MUERTE), mme.fit$estimate[1], mme.fit$estimate[2])),
-                                 cumsum(dlnorm(unique(TIEMPO_MUERTE), mge.fit$estimate[1], mge.fit$estimate[2])),
-                                 cumsum(dlnorm(unique(TIEMPO_MUERTE), mse.fit$estimate[1], mse.fit$estimate[2]))),
-                       Label = c(rep("ECDF", length(sort(unique(TIEMPO_MUERTE)))),
-                                 rep("MLE",  length(sort(unique(TIEMPO_MUERTE)))),
-                                 rep("MME",  length(sort(unique(TIEMPO_MUERTE)))),
-                                 rep("MGE",  length(sort(unique(TIEMPO_MUERTE)))),
-                                 rep("MSE",  length(sort(unique(TIEMPO_MUERTE))))));
+plot_dtf <- data.frame(x     = rep(sort(unique(TIEMPO_MUERTE)), 3),
+                       CDF   = c(plnorm(sort(unique(TIEMPO_MUERTE)), mle.fit$estimate[1], mle.fit$estimate[2]),
+                                 plnorm(sort(unique(TIEMPO_MUERTE)), mme.fit$estimate[1], mme.fit$estimate[2]),
+                                 plnorm(sort(unique(TIEMPO_MUERTE)), mge.fit$estimate[1], mge.fit$estimate[2])),
+                                 Label = c(rep("MLE",  length(sort(unique(TIEMPO_MUERTE)))),
+                                           rep("MME",  length(sort(unique(TIEMPO_MUERTE)))),
+                                           rep("MGE",  length(sort(unique(TIEMPO_MUERTE))))));
 
 mse_dtf  <- c(1/length(unique(TIEMPO_MUERTE)) *  
-                sum(abs(cumsum(dlnorm(unique(TIEMPO_MUERTE), mle.fit$estimate[1], mle.fit$estimate[2])) +
-                       -cumsum(as.numeric(table(TIEMPO_MUERTE)))/sum(as.numeric(table(TIEMPO_MUERTE))))),
+                sum(abs(plnorm(sort(unique(TIEMPO_MUERTE)), mle.fit$estimate[1], mle.fit$estimate[2]) -
+                        cumsum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq)/sum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq))),
               1/length(unique(TIEMPO_MUERTE)) *  
-                sum(abs(cumsum(dlnorm(unique(TIEMPO_MUERTE), mme.fit$estimate[1], mme.fit$estimate[2])) +
-                       -cumsum(as.numeric(table(TIEMPO_MUERTE)))/sum(as.numeric(table(TIEMPO_MUERTE))))),
+                sum(abs(plnorm(sort(unique(TIEMPO_MUERTE)), mme.fit$estimate[1], mme.fit$estimate[2]) -
+                        cumsum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq)/sum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq))),
               1/length(unique(TIEMPO_MUERTE)) *  
-                sum(abs(cumsum(dlnorm(unique(TIEMPO_MUERTE), mge.fit$estimate[1], mge.fit$estimate[2])) +
-                       -cumsum(as.numeric(table(TIEMPO_MUERTE)))/sum(as.numeric(table(TIEMPO_MUERTE))))),
-              1/length(unique(TIEMPO_MUERTE)) *  
-                sum(abs(cumsum(dlnorm(unique(TIEMPO_MUERTE), mse.fit$estimate[1], mse.fit$estimate[2])) +
-                       -cumsum(as.numeric(table(TIEMPO_MUERTE)))/sum(as.numeric(table(TIEMPO_MUERTE))))))
+                sum(abs(plnorm(sort(unique(TIEMPO_MUERTE)), mge.fit$estimate[1], mge.fit$estimate[2]) -
+                        cumsum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq)/sum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq))))
 
 ggplot() +
   
+  geom_step(aes(x = sort(unique(TIEMPO_MUERTE)), y = cumsum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq)/sum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq))) +
   geom_line(data = plot_dtf, aes(x = x, y = CDF, col = Label),
             size = 0.75) +
   
   geom_text(aes(x = 90, y = 0.30), label = paste0("MLE: ", round(mse_dtf[1], 3)), size = 4) +
   geom_text(aes(x = 90, y = 0.25), label = paste0("MME: ", round(mse_dtf[2], 3)), size = 4) +
   geom_text(aes(x = 90, y = 0.20), label = paste0("MGE: ", round(mse_dtf[3], 3)), size = 4) +
-  geom_text(aes(x = 90, y = 0.15), label = paste0("MSE: ", round(mse_dtf[4], 3)), size = 4) +
   
-  
-  scale_color_manual(values = c("black", "tomato3", "forestgreen", "#009dd0", "#f58f3b")) +
+  scale_color_manual(values = c("tomato3", "forestgreen", "#009dd0", "#f58f3b")) +
   
   # Custom Labels;
-  labs(title = "Cumulative Density Functions of Proposed Distributions for Decease Time",
+  labs(title = "Cumulative Distribution Function of Proposed Distributions for Decease Time",
        subtitle = "Bottom-Left: MAE between the ECDF and Proposals",
        x = "Decease Time (in days)",
        y = "Cumulative Density") +
