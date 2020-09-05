@@ -38,7 +38,8 @@ mse_dtf  <- c(1/length(unique(TIEMPO_MUERTE)) *
 
 ggplot() +
   
-  geom_step(aes(x = sort(unique(TIEMPO_MUERTE)), y = cumsum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq)/sum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq))) +
+  geom_step(aes(x = sort(unique(TIEMPO_MUERTE)), 
+                y = cumsum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq)/sum(data.frame(table(sort(TIEMPO_MUERTE)))$Freq))) +
   geom_line(data = plot_dtf, aes(x = x, y = CDF, col = Label),
             size = 0.75) +
   
@@ -81,6 +82,8 @@ ggplot() +
             col  = "#009dd0",
             linetype = "dashed") +
   geom_text(aes(x = 44, y = 0.0625), label = "99-th Percentile", size = 4) +
+  
+  scale_x_continuous(breaks = c(0, 25, 39.55, 50, 75)) +
   
   # Custom Labels;
   labs(title = "Histogram of Decease Time from Sars-Cov-19 since first Symptoms",
