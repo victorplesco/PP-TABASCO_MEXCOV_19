@@ -52,7 +52,7 @@ ggplot() +
   labs(title = "Cumulative Distribution Function of Proposed Distributions for Decease Time",
        subtitle = "Bottom-Left: MAE between the ECDF and Proposals",
        x = "Decease Time (in days)",
-       y = "Cumulative Density") +
+       y = "Probability") +
   theme_bw(base_size = 17.5, base_family = "Times") +
   theme(legend.title = element_blank()) + 
   theme(legend.position = "bottom");
