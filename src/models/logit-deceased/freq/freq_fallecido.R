@@ -268,7 +268,7 @@ grid.arrange(cut.plot, acc.plot, sen.plot, spe.plot, nrow = 2); rm(acc.plot, cut
 ## Final Model ##################################################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
-glm.logit.fit     <- glm(FALLECIDO ~ . -EDAD, family = binomial(link = "logit"), data = swabspos[, -c(5, 8, 11)], na.action = na.omit);
+glm.logit.fit     <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[, -c(5, 8, 11)], na.action = na.omit);
 glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = swabspos, type = "response")); 
 predicted.classes <- factor(ifelse(glm.logit.predict > 0.1610234, "Yes", "No"), levels = c("Yes", "No")); target <- factor(swabspos$FALLECIDO, levels = c("Yes", "No"));
 confusionMatrix(data = predicted.classes, reference = target, positive = "Yes");
