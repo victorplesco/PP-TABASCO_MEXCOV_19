@@ -43,9 +43,9 @@ ggplot() +
   geom_line(data = plot_dtf, aes(x = x, y = CDF, col = Label),
             size = 0.75) +
   
-  geom_text(aes(x = 90, y = 0.30), label = paste0("MLE: ", round(mse_dtf[1], 3)), size = 4) +
-  geom_text(aes(x = 90, y = 0.25), label = paste0("MME: ", round(mse_dtf[2], 3)), size = 4) +
-  geom_text(aes(x = 90, y = 0.20), label = paste0("MGE: ", round(mse_dtf[3], 3)), size = 4) +
+  geom_text(aes(x = 79, y = 0.2455), label = paste0("MLE: ", round(mse_dtf[1], 3)), size = 5) +
+  geom_text(aes(x = 79, y = 0.1875), label = paste0("MME: ", round(mse_dtf[2], 3)), size = 5) +
+  geom_text(aes(x = 79, y = 0.1295), label = paste0("MGE: ", round(mse_dtf[3], 3)), size = 5) +
   
   scale_color_manual(values = c("tomato3", "forestgreen", "#009dd0", "#f58f3b")) +
   
