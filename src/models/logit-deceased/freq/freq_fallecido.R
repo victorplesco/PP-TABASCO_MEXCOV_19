@@ -1,5 +1,5 @@
 source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R")
-source("~/TABASCO-MEXCOV-19/src/cleansing/swabspos_0718.R")
+swabspos <- read.csv(gzfile("~/TABASCO-MEXCOV-19/data/cleansed/0718/swabspos_0718.csv.gz"))
 
 #################################################################################################################################################################################################################################################################################
 ## 5-fold Cross Validation ######################################################################################################################################################################################################################################################
@@ -57,8 +57,8 @@ for(i in 1:5)
   };
 }; rm(glm.logit.fit, dev, i, index, j, k, variables);
 
-# saveRDS(indices, "~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/training_indices.rds"); rm(indices);
-training_indices <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/training_indices.rds");
+# saveRDS(indices, "~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/5-fold_Cross_Validation/training_indices.rds"); rm(indices);
+training_indices <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/5-fold_Cross_Validation/training_indices.rds");
 
 ggplot() +
   
@@ -117,11 +117,11 @@ for(i in 1:5)
   };
 }; rm(flds, glm.model, test.set, training_indices, i, j, target, "confmatrix");
 
-# saveRDS(indices, "~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/test_error.rds"); rm(indices);
-test_error <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/test_error.rds");
+# saveRDS(indices, "~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/5-fold_Cross_Validation/test_error.rds"); rm(indices);
+test_error <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/5-fold_Cross_Validation/test_error.rds");
 
-# saveRDS(indices, "~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/train_error.rds"); rm(indices);
-train_error <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit/freq/5-fold_Cross_Validation/train_error.rds");
+# saveRDS(indices, "~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/5-fold_Cross_Validation/train_error.rds"); rm(indices);
+train_error <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/5-fold_Cross_Validation/train_error.rds");
 
 # Complexity Vs (Cutoff, Accuracy, Sensitivity, Specificity) on TRAIN and TEST sets;
 {
@@ -268,7 +268,8 @@ grid.arrange(cut.plot, acc.plot, sen.plot, spe.plot, nrow = 2); rm(acc.plot, cut
 ## Final Model ##################################################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
-glm.logit.fit     <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[, -c(5, 8, 11)], na.action = na.omit);
+glm.logit.fit     <- glm(FALLECIDO ~ . -EDAD, family = binomial(link = "logit"), data = swabspos[, -c(5, 8, 11)], na.action = na.omit);
 glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = swabspos, type = "response")); 
-predicted.classes <- factor(ifelse(glm.logit.predict > 0.5, "Yes", "No"), levels = c("Yes", "No")); target <- factor(swabspos$FALLECIDO, levels = c("Yes", "No"));
+predicted.classes <- factor(ifelse(glm.logit.predict > 0.1610234, "Yes", "No"), levels = c("Yes", "No")); target <- factor(swabspos$FALLECIDO, levels = c("Yes", "No"));
 confusionMatrix(data = predicted.classes, reference = target, positive = "Yes");
+# summary(glm.logit.fit);

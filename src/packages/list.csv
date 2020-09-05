@@ -5,6 +5,8 @@ caret
 gridExtra
 rstanarm
 DescTools
+rstan
+rstantools
 vcd
 reshape2
 ggalt
@@ -13,3 +15,4 @@ naniar
 logspline
 kableExtra
 data.table
+epitools

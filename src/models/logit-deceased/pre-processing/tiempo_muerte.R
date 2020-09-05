@@ -1,21 +1,21 @@
 source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R");
 source("~/TABASCO-MEXCOV-19/src/cleansing/swabsraw_0718.R");
 
-# defaultW <- getOption("warn") 
-# options(warn = -1) 
-# options(warn = defaultW)
+# defaultW <- getOption("warn");
+# options(warn = -1);
+# options(warn = defaultW);
 
 tmp <- as.data.frame(swabsraw %>% filter(RESULTADO == "Positive"));
 TIEMPO_MUERTE <- as.numeric(tmp$FECHA_DEF - tmp$FECHA_SINTOMAS); TIEMPO_MUERTE <- TIEMPO_MUERTE[-c(which(is.na(TIEMPO_MUERTE)), which(TIEMPO_MUERTE <= 0))]; rm(tmp);
 
 #################################################################################################################################################################################################################################################################################
-## TIEMPO_MUERTE | Estimation ######################################################################################################################################################################################################################################################
+## TIEMPO_MUERTE | fitdistrplus #################################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
 descdist(TIEMPO_MUERTE, boot = 100, discrete = FALSE);
 
 # Possible methods: “mle”, “mme”, “qme”, “mge”, “mse”; 
-fit.lognorm <- fitdist(TIEMPO_MUERTE, "lnorm", method = c("mge"));
+fit.lognorm <- fitdist(TIEMPO_MUERTE, "lnorm", method = c("mse"));
 fit.weibull <- fitdist(TIEMPO_MUERTE, "weibull", method = c("mse"));
 
 ggplot() +
@@ -35,7 +35,7 @@ ggplot() +
   
   geom_line(aes(x = rep(qlnorm(0.99, fit.lognorm$estimate[1], fit.lognorm$estimate[2]), 2), y = c(0, 0.065)),
             size = 1.25,
-            col  = "tomato3") 
+            col  = "tomato3") +
   
   # WEIBULL
   geom_line(aes(x = qweibull(seq(0.000000001, 0.9999999, length = 10000), fit.weibull$estimate[1], fit.weibull$estimate[2]), 

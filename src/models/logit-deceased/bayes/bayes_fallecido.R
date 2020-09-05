@@ -1,8 +1,25 @@
-source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R")
-source("~/TABASCO-MEXCOV-19/src/cleansing/swabsraw_0718.R")
+source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R");
+source("~/TABASCO-MEXCOV-19/src/cleansing/swabspos_0718.R");
 
-swabspos <- as.data.frame(swabsraw %>% filter(RESULTADO == "Positive") %>%
-                            mutate(TIEMPO_INFECCION = as.numeric(as.Date("2020-07-18") - FECHA_SINTOMAS))); # Time being infected; 
-ind      <- which(swabspos$TIEMPO_INFECCION <= 40); swabspos <- swabspos[-ind,]; # After 40d we estimate recovering;                                                
-swabspos <- as.data.frame(swabspos %>% select(-c(ID_REGISTRO, EMBARAZO, NEUMONIA, OTRO_CASO, ENTIDAD_UM, FECHA_INGRESO, FECHA_SINTOMAS, FECHA_DEF, RESULTADO, TIPO_PACIENTE, UCI, INTUBADO, TIEMPO_INFECCION))); rm(ind, swabsraw);
-swabspos <- na.omit(swabspos); # summary(swabspos);
+
+
+
+
+
+
+ind <- sample(1:nrow(swabspos), 1000, replace = F); 
+
+test.data.simple <- swabspos[ind, c(1, 12)];  
+test.data.complex <- swabspos[ind,];
+# summary(test.data);
+
+stan.glm.model.simple <- stan_glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = test.data.simple);
+stan.glm.model.complex <- stan_glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = test.data.complex);
+
+coef(stan.glm.model.simple);
+coef(stan.glm.model.complex);
+
+as.data.frame(stan.glm.model); # DISTRIBUTION of PARAMETERS;
+summary(stan.glm.model);
+coef(stan.glm.model); # purrr::map_dbl(as.data.frame(stan.glm.model), median);
+posterior_interval(stan.glm.model);
