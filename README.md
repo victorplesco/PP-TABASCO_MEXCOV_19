@@ -20,7 +20,8 @@ Individual level details per swab: <br/>
  * `swabsraw_0718` | until 18/07/2020
  
  Individual level details per positive swab: <br/>
- * `swabspos_0718` | until 18/07/2020 for Logistic Regression
+ * `swabspos_log_0718` | until 18/07/2020 for Logistic Regression
+ * `swabspos_fnn_0718` | until 18/07/2020 for FNN
 
 <h2>
   Notes

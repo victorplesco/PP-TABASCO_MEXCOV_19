@@ -1,0 +1,76 @@
+---
+title: ""
+output: pdf_document
+---
+
+# CONVERGENCE DIAGNOSTICS;  
+
+```{r echo = FALSE, results = 'hide', message = FALSE, results = 'asis'}
+require(tidyverse);
+require(kableExtra);
+require(caret);
+options(knitr.kable.NA = '')
+
+tmp_1 <- read.table("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/COEFFICIENTS.txt");
+tmp_2 <- read.table("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/COEFFICIENTS.txt");
+
+tmp <- data.frame(" "       = c(NA, rownames(tmp_1)[1:9]),
+                  "Model 1" = c("n_eff", round(tmp_1$n_eff[1:9], 0)),
+                  " "       = c("Rhat",  round(tmp_1$Rhat[1:9], 0)),
+                  "Model 2" = c("n_eff", round(tmp_2$n_eff[1:9], 0)),
+                  " "       = c("Rhat",  round(tmp_2$Rhat[1:9], 0)))
+knitr::kable(tmp, row.names = FALSE, col.names = c(" ",
+                                                  "Model 1",
+                                                  " ",
+                                                  "Model 2",
+                                                  " "),
+             format = 'latex', booktabs = TRUE, align = c("l", rep("c", 4))) %>% kable_styling(position = "center", font_size = 8.5)
+```  
+
+# TRAIN & TEST ERRORS;  
+
+```{r echo = FALSE, results = 'hide', message = FALSE, results = 'asis'}
+require(tidyverse);
+require(kableExtra);
+options(knitr.kable.NA = '')
+
+out_train_model1 = readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/out_train_model1.rds");
+out_train_model2 = readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/out_train_model2.rds");
+
+out_test_model1 = readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/out_test_model1.rds");
+out_test_model2 = readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/out_test_model2.rds");
+
+tmp <- data.frame(" "       = c(NA, "Train", "Test"),
+                  "Model 1" = c("Accuracy", round(out_train_model1$Accuracy, 6), round(out_test_model1$Accuracy, 6)),
+                  " "       = c("Sensitivity",  round(out_train_model1$Sensitivity, 6), round(out_test_model1$Sensitivity, 6)),
+                  " "       = c("Specificity",  round(out_train_model1$Specificity, 6), round(out_test_model1$Specificity, 6)),
+                  "Model 2" = c("Accuracy", round(out_train_model2$Accuracy, 6), round(out_test_model2$Accuracy, 6)),
+                  " "       = c("Sensitivity",  round(out_train_model2$Sensitivity, 6), round(out_test_model2$Sensitivity, 6)),
+                  " "       = c("Specificity",  round(out_train_model2$Specificity, 6), round(out_test_model2$Specificity, 6)))
+
+knitr::kable(tmp, row.names = FALSE, col.names = c(" ",
+                                                  "Model 1",
+                                                  " ",
+                                                  " ",
+                                                  "Model 2",
+                                                  " ",
+                                                  " "),
+             format = 'latex', booktabs = TRUE, align = c("l", rep("c", 6))) %>% kable_styling(position = "center", font_size = 8.5)
+```  
+
+# BAYESIAN LOGISTIC REGRESSION SUMMARY;  
+
+```{r echo = FALSE, results = 'hide', message = FALSE, results = 'asis'}
+require(tidyverse);
+require(kableExtra);
+
+tmp <- read.table("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/COEFFICIENTS.txt"); tmp <- tmp[1:9,];
+tstudent.stan.glm.model.8x2000    <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/tstudent.stan.glm.model.8x2000.rds");
+median <- apply(X = data.frame(tstudent.stan.glm.model.8x2000), MARGIN = 2, FUN = median); tmp$mean <- median;
+
+knitr::kable(round(tmp[1:9, 1:4], 7), row.names = TRUE, col.names = c("Estimates",
+                                                                      "Standard Error",
+                                                                      "2.5 (%)",
+                                                                      "97.5 (%)"),
+             format = 'latex', booktabs = TRUE, align = c("r", rep('c', 6))) %>% kable_styling(position = "center", font_size = 8.5)
+```

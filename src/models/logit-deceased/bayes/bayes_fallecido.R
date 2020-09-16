@@ -1,5 +1,5 @@
 source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R");
-swabspos <- read.csv(gzfile("~/TABASCO-MEXCOV-19/data/cleansed/0718/swabspos_0718.csv.gz"));
+swabspos <- read.csv(gzfile("~/TABASCO-MEXCOV-19/data/cleansed/0718/swabspos_log_0718.csv.gz"));
 
 #################################################################################################################################################################################################################################################################################
 ## Train/Test Set ###############################################################################################################################################################################################################################################################
@@ -14,12 +14,11 @@ train.set <- swabspos[ind, -c(5, 8, 11)]; test.set  <- swabspos[-ind, -c(5, 8, 1
 #################################################################################################################################################################################################################################################################################
 
 tstudent.stan.glm.model.8x2000    <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/tstudent.stan.glm.model.8x2000.rds");
-# write.table(tstudent.stan.glm.model.8x2000$stan_summary[, c(1, 3, 4, 10:12)], "~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/coef_summary.txt");
+# write.table(tstudent.stan.glm.model.8x2000$stan_summary[, c(1, 3, 4, 10:12)], "~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/COEFFICIENTS.txt");
+# launch_shinystan(tstudent.stan.glm.model.8x2000);
 
 boot.normal.stan.glm.model.8x2000 <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/boot.normal.stan.glm.model.8x2000.rds");
-# write.table(boot.normal.stan.glm.model.8x2000$stan_summary[, c(1, 3, 4, 10:12)], "~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/coef_summary.txt");
-
-# launch_shinystan(tstudent.stan.glm.model.8x2000);
+# write.table(boot.normal.stan.glm.model.8x2000$stan_summary[, c(1, 3, 4, 10:12)], "~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/COEFFICIENTS.txt");
 # launch_shinystan(boot.normal.stan.glm.model.8x2000);
 
 #################################################################################################################################################################################################################################################################################
@@ -163,14 +162,15 @@ out_train_model2 = readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/
 ## Prediction - Testing Data ####################################################################################################################################################################################################################################################
 #################################################################################################################################################################################################################################################################################
 
-require(loo)
-
 ##
 ## MODEL 1
 ##
+install.packages("fst")
+require(fst)
 
-# predict_model1 <- posterior_epred(tstudent.stan.glm.model.8x2000, newdata = test.set, draws = 500);
-# saveRDS(predict_model1, "~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/predict_model1.rds"); # rm(predict_model1);
+
+# predict_model1 <- posterior_epred(tstudent.stan.glm.model.8x2000, newdata = test.set, draws = 500); # Too big to be stored on GitHub;
+# saveRDS(predict_model1, "~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/predict_modelAAA.rds", compress = TRUE); # rm(predict_model1);
 predict_model1 <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/predict_model1.rds");
 
 predict_means1 = colMeans(predict_model1); 
@@ -201,7 +201,7 @@ out_test_model1 = readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/P
 ## MODEL 2
 ##
 
-# predict_model2 <- posterior_epred(boot.normal.stan.glm.model.8x2000, newdata = test.set, draws = 500);
+# predict_model2 <- posterior_epred(boot.normal.stan.glm.model.8x2000, newdata = test.set, draws = 500); # Too big to be stored on GitHub;
 # saveRDS(predict_model2, "~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/predict_model2.rds"); # rm(predict_model2);
 predict_model2 <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/predict_model2.rds");
 
