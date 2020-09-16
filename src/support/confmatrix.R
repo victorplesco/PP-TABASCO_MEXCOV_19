@@ -53,4 +53,3 @@ confmatrix <- function(test.set, target, glm.model, show.plot = FALSE)
   };
   out = list(Cutoff = cutoff[opt], Specificity = indices$specificity[opt], Sensitivity = indices$sensitivity[opt], Accuracy = indices$accuracy[opt], "Confusion Matrix" = optconfusionmatrix); return(out);
 };
-

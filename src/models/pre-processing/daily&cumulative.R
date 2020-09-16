@@ -1,4 +1,4 @@
-mex <- as.data.frame(read.csv("~/TABASCO-MEXCOV-19/data/metadata/WHO-COVID-19-MEXICO.csv") %>% filter(Country == "Mexico") %>% select(Date_reported,    
+mex <- as.data.frame(read.csv("~/TABASCO-MEXCOV-19/data/metadata/who-covid-19-mexico.csv") %>% filter(Country == "Mexico") %>% select(Date_reported,    
                                                                                                                                       New_cases, Cumulative_cases,
                                                                                                                                       New_deaths, Cumulative_deaths));
 

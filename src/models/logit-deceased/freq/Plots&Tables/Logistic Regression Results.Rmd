@@ -1,0 +1,30 @@
+---
+title: ""
+output: pdf_document
+---
+
+```{r echo = FALSE, results = 'hide', message = FALSE, results = 'asis'}
+require(tidyverse);
+require(kableExtra);
+require(caret);
+options(knitr.kable.NA = '')
+
+swabspos <- read.csv(gzfile("~/TABASCO-MEXCOV-19/data/cleansed/0718/swabspos_0718.csv.gz"));
+glm.logit.fit     <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[, -c(5, 8, 11)], na.action = na.omit);
+glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = swabspos, type = "response")); 
+predicted.classes <- factor(ifelse(glm.logit.predict > 0.1610234, "Yes", "No"), levels = c("Yes", "No")); target <- factor(swabspos$FALLECIDO, levels = c("Yes", "No"));
+tmp               <- confusionMatrix(data = predicted.classes, reference = target, positive = "Yes");
+
+test_error  <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/5-fold_Cross_Validation/test_error.rds");
+train_error <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/5-fold_Cross_Validation/train_error.rds");
+
+dtf <- data.frame(" "                = c("Train", "Test"),
+                  Accuracy           = c(mean(train_error$ACCURACY[8,]),    mean(test_error$ACCURACY[8,])),
+                  "Accuracy (SE)"    = c(sd(train_error$ACCURACY[8,]),      sd(test_error$ACCURACY[8,])),
+                  Sensitivity        = c(mean(train_error$SENSITIVITY[8,]), mean(test_error$SENSITIVITY[8,])),
+                  "Sensitivity (SE)" = c(sd(train_error$SENSITIVITY[8,]),   sd(test_error$SENSITIVITY[8,])),
+                  Specificity        = c(mean(train_error$SPECIFICITY[8,]), mean(test_error$SPECIFICITY[8,])),
+                  "Specificity (SE)" = c(sd(train_error$SPECIFICITY[8,]),   sd(test_error$SPECIFICITY[8,])));
+knitr::kable(dtf, row.names = FALSE, col.names = c(" ", "Accuracy", "Accuracy (SE)", "Sensitivity", "Sensitivity (SE)", "Specificity", "Specificity (SE)"), 
+             format = 'latex', align = rep('c', 3), booktabs = T);
+```

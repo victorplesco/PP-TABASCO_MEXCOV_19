@@ -49,10 +49,10 @@ for(i in 1:5)
         indices$AIC[j, i]        = (2 * length(glm.logit.fit$coefficients)) + (-2 * as.numeric(logLik(glm.logit.fit))); # AIC;
         indices$BIC[j, i]        = (log(length(flds[[i]])) * length(glm.logit.fit$coefficients)) + (-2 * as.numeric(logLik(glm.logit.fit))); # BIC;
         indices$LRT[j, i]        = pchisq(-2 * (as.numeric(logLik(prior.glm.fit) - as.numeric(logLik(glm.logit.fit)))), 1, lower.tail = FALSE); # Likelihood Ratio Test;
-        indices$WALD[j, i]       = pnorm(as.numeric(glm.logit.fit$coefficients[j + 1])/sqrt(summary(glm.logit.fit)$cov.scaled[j + 1, j + 1]), 0, 1, lower.tail = FALSE); # Wald Test;
-        
+        if(j == 11){indices$WALD[, i] = round(as.numeric(coef(summary(glm.logit.fit))[-1, 4]), 4)}; # Wald Test;
+
         cat(" variables: ", variables, "\n", "index: ", index, "\n", "tmp: ", tmp, "\n");
-      } 
+      };
     };
   };
 }; rm(glm.logit.fit, dev, i, index, j, k, variables);
@@ -129,10 +129,10 @@ cut.plot <- ggplot() +
   
   # 5-fold CV Cutoff;
   geom_line(aes(x = c(1:11), y = apply(X = test_error$CUTOFF, MARGIN = 1, FUN = mean)),
-            col = "black",
+            col = "#009dd0",
             size = 0.75) +
   geom_line(aes(x = c(1:11), y = apply(X = train_error$CUTOFF, MARGIN = 1, FUN = mean)),
-            col = "tomato3",
+            col = "#f58f3b",
             size = 0.75) +
   
   geom_ribbon(aes(x = c(1:11),
@@ -140,17 +140,17 @@ cut.plot <- ggplot() +
                   ymax = apply(X = test_error$CUTOFF, MARGIN = 1, FUN = max)), 
               alpha    = 0.1,
               linetype = "dashed",
-              colour   = "black",
+              colour   = "#009dd0",
               size     = 0.75,
-              fill     = "black") +
+              fill     = "#009dd0") +
   geom_ribbon(aes(x = c(1:11),
                   ymin = apply(X = train_error$CUTOFF, MARGIN = 1, FUN = min), 
                   ymax = apply(X = train_error$CUTOFF, MARGIN = 1, FUN = max)), 
               alpha    = 0.1,
               linetype = "dashed",
-              colour   = "tomato3",
+              colour   = "#f58f3b",
               size     = 0.75,
-              fill     = "tomato3") +
+              fill     = "#f58f3b") +
   
   # Custom Labels;
   labs(title = "",
@@ -163,10 +163,10 @@ acc.plot <- ggplot() +
   
   # 5-fold CV Accuracy;
   geom_line(aes(x = c(1:11), y = apply(X = test_error$ACCURACY, MARGIN = 1, FUN = mean)),
-            col = "black",
+            col = "#009dd0",
             size = 0.75) +
   geom_line(aes(x = c(1:11), y = apply(X = train_error$ACCURACY, MARGIN = 1, FUN = mean)),
-            col = "tomato3",
+            col = "#f58f3b",
             size = 0.75) +
   
   geom_ribbon(aes(x = c(1:11),
@@ -174,17 +174,17 @@ acc.plot <- ggplot() +
                   ymax = apply(X = test_error$ACCURACY, MARGIN = 1, FUN = max)), 
               alpha    = 0.1,
               linetype = "dashed",
-              colour   = "black",
+              colour   = "#009dd0",
               size     = 0.75,
-              fill     = "black") +
+              fill     = "#009dd0") +
   geom_ribbon(aes(x = c(1:11),
                   ymin = apply(X = train_error$ACCURACY, MARGIN = 1, FUN = min), 
                   ymax = apply(X = train_error$ACCURACY, MARGIN = 1, FUN = max)), 
               alpha    = 0.1,
               linetype = "dashed",
-              colour   = "tomato3",
+              colour   = "#f58f3b",
               size     = 0.75,
-              fill     = "tomato3") +
+              fill     = "#f58f3b") +
   
   # Custom Labels;
   labs(title = "",
@@ -197,10 +197,10 @@ sen.plot <- ggplot() +
   
   # 5-fold CV Sensitivity;
   geom_line(aes(x = c(1:11), y = apply(X = test_error$SENSITIVITY, MARGIN = 1, FUN = mean)),
-            col = "black",
+            col = "#009dd0",
             size = 0.75) +
   geom_line(aes(x = c(1:11), y = apply(X = train_error$SENSITIVITY, MARGIN = 1, FUN = mean)),
-            col = "tomato3",
+            col = "#f58f3b",
             size = 0.75) +
   
   geom_ribbon(aes(x = c(1:11),
@@ -208,17 +208,17 @@ sen.plot <- ggplot() +
                   ymax = apply(X = test_error$SENSITIVITY, MARGIN = 1, FUN = max)), 
               alpha    = 0.1,
               linetype = "dashed",
-              colour   = "black",
+              colour   = "#009dd0",
               size     = 0.75,
-              fill     = "black") +
+              fill     = "#009dd0") +
   geom_ribbon(aes(x = c(1:11),
                   ymin = apply(X = train_error$SENSITIVITY, MARGIN = 1, FUN = min), 
                   ymax = apply(X = train_error$SENSITIVITY, MARGIN = 1, FUN = max)), 
               alpha    = 0.1,
               linetype = "dashed",
-              colour   = "tomato3",
+              colour   = "#f58f3b",
               size     = 0.75,
-              fill     = "tomato3") +
+              fill     = "#f58f3b") +
   
   # Custom Labels;
   labs(title = "",
@@ -231,10 +231,10 @@ spe.plot <- ggplot() +
   
   # 5-fold CV Specificity;
   geom_line(aes(x = c(1:11), y = apply(X = test_error$SPECIFICITY, MARGIN = 1, FUN = mean)),
-            col = "black",
+            col = "#009dd0",
             size = 0.75) +
   geom_line(aes(x = c(1:11), y = apply(X = train_error$SPECIFICITY, MARGIN = 1, FUN = mean)),
-            col = "tomato3",
+            col = "#f58f3b",
             size = 0.75) +
   
   geom_ribbon(aes(x = c(1:11),
@@ -242,17 +242,17 @@ spe.plot <- ggplot() +
                   ymax = apply(X = test_error$SPECIFICITY, MARGIN = 1, FUN = max)), 
               alpha    = 0.1,
               linetype = "dashed",
-              colour   = "black",
+              colour   = "#009dd0",
               size     = 0.75,
-              fill     = "black") +
+              fill     = "#009dd0") +
   geom_ribbon(aes(x = c(1:11),
                   ymin = apply(X = train_error$SPECIFICITY, MARGIN = 1, FUN = min), 
                   ymax = apply(X = train_error$SPECIFICITY, MARGIN = 1, FUN = max)), 
               alpha    = 0.1,
               linetype = "dashed",
-              colour   = "tomato3",
+              colour   = "#f58f3b",
               size     = 0.75,
-              fill     = "tomato3") +
+              fill     = "#f58f3b") +
   
   # Custom Labels;
   labs(title = "",
@@ -261,7 +261,7 @@ spe.plot <- ggplot() +
        y = "Specificty") +
   theme_bw(base_size = 17.5, base_family = "Times");
 
-grid.arrange(cut.plot, acc.plot, sen.plot, spe.plot, nrow = 2); rm(acc.plot, cut.plot, sen.plot, spe.plot, test_error, train_error);
+grid.arrange(cut.plot, acc.plot, sen.plot, spe.plot, nrow = 2); # rm(acc.plot, cut.plot, sen.plot, spe.plot, test_error, train_error);
 }
 
 #################################################################################################################################################################################################################################################################################
@@ -269,6 +269,8 @@ grid.arrange(cut.plot, acc.plot, sen.plot, spe.plot, nrow = 2); rm(acc.plot, cut
 #################################################################################################################################################################################################################################################################################
 
 glm.logit.fit     <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[, -c(5, 8, 11)], na.action = na.omit);
+write.table(cbind(coef(summary(glm.logit.fit))[, c(1, 2)], confint(glm.logit.fit)), "~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/Plots&Tables/coef_summary.txt") 
+
 glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = swabspos, type = "response")); 
 predicted.classes <- factor(ifelse(glm.logit.predict > 0.1610234, "Yes", "No"), levels = c("Yes", "No")); target <- factor(swabspos$FALLECIDO, levels = c("Yes", "No"));
 confusionMatrix(data = predicted.classes, reference = target, positive = "Yes");

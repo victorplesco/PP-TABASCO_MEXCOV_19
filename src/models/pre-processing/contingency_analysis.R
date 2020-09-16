@@ -1,15 +1,9 @@
 source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R")
-source("~/TABASCO-MEXCOV-19/src/cleansing/swabsraw_0718.R")
+swabspos <- read.csv(gzfile("~/TABASCO-MEXCOV-19/data/cleansed/0718/swabspos_0718.csv.gz"));
 
 # defaultW <- getOption("warn") 
 # options(warn = -1) 
 # options(warn = defaultW)
-
-swabspos <- as.data.frame(swabsraw %>% filter(RESULTADO == "Positive") %>%
-                            mutate(TIEMPO_INFECCION = as.numeric(as.Date("2020-07-18") - FECHA_SINTOMAS))); # Time being infected; 
-ind      <- which(swabspos$FALLECIDO == "No" & swabspos$TIEMPO_INFECCION <= 40); swabspos <- swabspos[-ind,]; # After 40d we estimate recovering;                                                
-swabspos <- as.data.frame(swabspos %>% select(-c(ID_REGISTRO, NEUMONIA, OTRO_CASO, TIEMPO_INFECCION, ENTIDAD_UM, FECHA_INGRESO, FECHA_SINTOMAS, FECHA_DEF, RESULTADO, TIPO_PACIENTE, UCI, INTUBADO))); rm(ind);
-# summary(swabspos);
 
 #################################################################################################################################################################################################################################################################################
 ## Categorical ##################################################################################################################################################################################################################################################################
@@ -26,7 +20,7 @@ findindex <- function(vector, x)
   return(indexes);
 };
 
-tmp <- tmp[findindex(tmp, c("FALLECIDO", "SEXO", "EMBARAZO", "DIABETES", "EPOC", "ASMA", "INMUSUPR", "HIPERTENSION", "CARDIOVASCULAR", "OBESIDAD", "RENAL_CRONICA", "TABAQUISMO"))];
+tmp <- tmp[findindex(tmp, c("FALLECIDO", "SEXO", "DIABETES", "EPOC", "ASMA", "INMUSUPR", "HIPERTENSION", "CARDIOVASCULAR", "OBESIDAD", "RENAL_CRONICA", "TABAQUISMO"))];
 colnames(indipmatrix) <- tmp; rownames(indipmatrix) <- tmp; rm(tmp, findindex);
 
 for(i in 1:nrow(indipmatrix))
@@ -56,7 +50,7 @@ findindex <- function(vector, x)
   return(indexes);
 };
 
-tmp <- tmp[findindex(tmp, c("FALLECIDO", "SEXO", "EMBARAZO", "DIABETES", "EPOC", "ASMA", "INMUSUPR", "HIPERTENSION", "CARDIOVASCULAR", "OBESIDAD", "RENAL_CRONICA", "TABAQUISMO"))];
+tmp <- tmp[findindex(tmp, c("FALLECIDO", "SEXO", "DIABETES", "EPOC", "ASMA", "INMUSUPR", "HIPERTENSION", "CARDIOVASCULAR", "OBESIDAD", "RENAL_CRONICA", "TABAQUISMO"))];
 colnames(assocmatrix) <- tmp; rownames(assocmatrix) <- tmp; rm(tmp, findindex);
 
 for(i in 1:nrow(assocmatrix))
@@ -86,7 +80,7 @@ ggplot(data = indipData, aes(x = Var1, y = Var2)) +
   geom_point(data = assocData, aes(size = assocData[, 3]),
              color = "black") +
   
-  # scale_size(range = c(0, 10)) +
+  # scale_size(range = c(0, 5)) +
   
   # TEXT Solution;
   # geom_text(data = indipData, aes(label = round(as.numeric(assocData[, 3]), 2))) + 
@@ -96,12 +90,10 @@ ggplot(data = indipData, aes(x = Var1, y = Var2)) +
   # guides(size = guide_legend(override.aes = list(colour = "black"))) + 
 
   ## Custom Label
-  labs(title = "",
-       subtitle = "",
-       x = "",
+  labs(x = "",
        y = "") +
   theme_bw(base_size = 12.5, base_family = "Times") +
-  labs(fill = "p-value", size = "Cramer's V");
+  labs(fill = "Chi-squared Test \n(p-value)", size = "Cramer's V");
 
 #################################################################################################################################################################################################################################################################################
 ## Numerical ####################################################################################################################################################################################################################################################################

@@ -1,0 +1,19 @@
+---
+title: ""
+output: pdf_document
+---
+
+```{r echo = FALSE, results = 'hide', message = FALSE, results = 'asis'}
+require(tidyverse);
+require(kableExtra);
+
+tmp <- read.table("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/coef_summary.txt"); tmp <- tmp[1:9,];
+tstudent.stan.glm.model.8x2000    <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/tstudent.stan.glm.model.8x2000.rds");
+median <- apply(X = data.frame(tstudent.stan.glm.model.8x2000), MARGIN = 2, FUN = median); tmp$mean <- median;
+
+knitr::kable(round(tmp[1:9, 1:4], 7), row.names = TRUE, col.names = c("Estimates",
+                                                                      "Standard Error",
+                                                                      "2.5 (%)",
+                                                                      "97.5 (%)"),
+             format = 'latex', booktabs = TRUE, align = c("r", rep('c', 6))) %>% kable_styling(position = "center", font_size = 8.5)
+```

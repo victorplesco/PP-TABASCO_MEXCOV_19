@@ -1,0 +1,33 @@
+---
+title: ""
+output: pdf_document
+---
+
+```{r echo = FALSE, results = 'hide', message = FALSE, results = 'asis'}
+require(tidyverse);
+require(kableExtra);
+options(knitr.kable.NA = '')
+
+out_train_model1 = readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/out_train_model1.rds");
+out_train_model2 = readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/out_train_model2.rds");
+
+out_test_model1 = readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/out_test_model1.rds");
+out_test_model2 = readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/out_test_model2.rds");
+
+tmp <- data.frame(" "       = c(NA, "Train", "Test"),
+                  "Model 1" = c("Accuracy", round(out_train_model1$Accuracy, 6), round(out_test_model1$Accuracy, 6)),
+                  " "       = c("Sensitivity",  round(out_train_model1$Sensitivity, 6), round(out_test_model1$Sensitivity, 6)),
+                  " "       = c("Specificity",  round(out_train_model1$Specificity, 6), round(out_test_model1$Specificity, 6)),
+                  "Model 2" = c("Accuracy", round(out_train_model2$Accuracy, 6), round(out_test_model2$Accuracy, 6)),
+                  " "       = c("Sensitivity",  round(out_train_model2$Sensitivity, 6), round(out_test_model2$Sensitivity, 6)),
+                  " "       = c("Specificity",  round(out_train_model2$Specificity, 6), round(out_test_model2$Specificity, 6)))
+
+knitr::kable(tmp, row.names = FALSE, col.names = c(" ",
+                                                  "Model 1",
+                                                  " ",
+                                                  " ",
+                                                  "Model 2",
+                                                  " ",
+                                                  " "),
+             format = 'latex', booktabs = TRUE, align = c("l", rep("c", 6))) %>% kable_styling(position = "center", font_size = 8.5)
+```

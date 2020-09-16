@@ -1,0 +1,45 @@
+---
+title: ""
+output: pdf_document
+---
+
+```{r echo = FALSE, results = 'hide', message = FALSE, results = 'asis'}
+require(tidyverse);
+require(kableExtra);
+
+training_indices <- readRDS("~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/5-fold_Cross_Validation/training_indices.rds");
+for(i in 1:6)
+{
+  tmp = training_indices[[i]][9, 1];  training_indices[[i]][9, 1]  = training_indices[[i]][8, 1];  training_indices[[i]][8, 1]  = tmp;
+  tmp = training_indices[[i]][9, 3];  training_indices[[i]][9, 3]  = training_indices[[i]][8, 3];  training_indices[[i]][8, 3]  = tmp;
+  tmp = training_indices[[i]][9, 4];  training_indices[[i]][9, 4]  = training_indices[[i]][8, 4];  training_indices[[i]][8, 4]  = tmp;
+  tmp = training_indices[[i]][11, 4]; training_indices[[i]][11, 4] = training_indices[[i]][10, 4]; training_indices[[i]][10, 4] = tmp;
+}
+
+tmp <-   data.frame( Predictors = c(    "+ EDAD",       "+ DIABETES",
+                                        "+ SEXO",  "+ RENAL_CRONICA",
+                                    "+ OBESIDAD",   "+ HIPERTENSION",
+                                    "+ INMUSUPR",           "+ EPOC",
+                                        "+ ASMA", "+ CARDIOVASCULAR",
+                                                      "+ TABAQUISMO"),
+                       Deviance = apply(X = training_indices$DEVIANCE, MARGIN = 1, FUN = mean),
+                "Deviance (SE)" = apply(X = training_indices$DEVIANCE, MARGIN = 1, FUN = sd),
+                            AIC = apply(X = training_indices$AIC,      MARGIN = 1, FUN = mean),
+                     "AIC (SE)" = apply(X = training_indices$AIC,      MARGIN = 1, FUN = sd),
+        "Likelihood Ratio Test" = apply(X = training_indices$LRT,      MARGIN = 1, FUN = mean),
+   "Likelihood Ratio Test (SE)" = apply(X = training_indices$LRT,      MARGIN = 1, FUN = sd),
+                    "Wald Test" = apply(X = training_indices$WALD,     MARGIN = 1, FUN = mean),
+               "Wald Test (SE)" = apply(X = training_indices$WALD,     MARGIN = 1, FUN = sd));
+
+tmp <- as.data.frame(tmp %>% mutate(round(tmp[, c(3, 5)], 2), round(tmp[, c(6:9)], 4)));
+knitr::kable(tmp, row.names = FALSE, col.names = c("Predictors",
+                                                   "Deviance",
+                                                   "Deviance (SE)",
+                                                   "AIC",
+                                                   "AIC (SE)",
+                                                   "LRT",
+                                                   "LRT (SE)",
+                                                   "Wald Test",
+                                                   "Wald Test (SE)"),
+             format = 'latex', booktabs = TRUE, align = c("r", rep('c', 8))) %>% kable_styling(position = "center", font_size = 8.5)
+```

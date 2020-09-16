@@ -1,0 +1,26 @@
+---
+title: ""
+output: pdf_document
+---
+
+```{r echo = FALSE, results = 'hide', message = FALSE, results = 'asis'}
+require(tidyverse);
+require(kableExtra);
+require(caret);
+options(knitr.kable.NA = '')
+
+tmp_1 <- read.table("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_1/coef_summary.txt");
+tmp_2 <- read.table("~/TABASCO-MEXCOV-19/src/models/logit-deceased/bayes/Prior-Models/Model_2/coef_summary.txt");
+
+tmp <- data.frame(" "       = c(NA, rownames(tmp_1)[1:9]),
+                  "Model 1" = c("n_eff", round(tmp_1$n_eff[1:9], 0)),
+                  " "       = c("Rhat",  round(tmp_1$Rhat[1:9], 0)),
+                  "Model 2" = c("n_eff", round(tmp_2$n_eff[1:9], 0)),
+                  " "       = c("Rhat",  round(tmp_2$Rhat[1:9], 0)))
+knitr::kable(tmp, row.names = FALSE, col.names = c(" ",
+                                                  "Model 1",
+                                                  " ",
+                                                  "Model 2",
+                                                  " "),
+             format = 'latex', booktabs = TRUE, align = c("l", rep("c", 4))) %>% kable_styling(position = "center", font_size = 8.5)
+```
