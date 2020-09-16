@@ -75,7 +75,7 @@ ggplot() +
               linetype = "dashed",
               colour   = "black",
               size     = 0.75,
-              fill     = "tomato3") +
+              fill     = "#009dd0") +
   
   # Custom Labels;
   labs(title = "5-fold CV",
@@ -269,7 +269,7 @@ grid.arrange(cut.plot, acc.plot, sen.plot, spe.plot, nrow = 2); # rm(acc.plot, c
 #################################################################################################################################################################################################################################################################################
 
 glm.logit.fit     <- glm(FALLECIDO ~ ., family = binomial(link = "logit"), data = swabspos[, -c(5, 8, 11)], na.action = na.omit);
-write.table(cbind(coef(summary(glm.logit.fit))[, c(1, 2)], confint(glm.logit.fit)), "~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/Plots&Tables/coef_summary.txt") 
+write.table(cbind(coef(summary(glm.logit.fit))[, c(1, 2)], confint(glm.logit.fit)), "~/TABASCO-MEXCOV-19/src/models/logit-deceased/freq/Plots&Tables/COEFFICIENTS.txt") 
 
 glm.logit.predict <- as.vector(predict(glm.logit.fit, newdata = swabspos, type = "response")); 
 predicted.classes <- factor(ifelse(glm.logit.predict > 0.1610234, "Yes", "No"), levels = c("Yes", "No")); target <- factor(swabspos$FALLECIDO, levels = c("Yes", "No"));

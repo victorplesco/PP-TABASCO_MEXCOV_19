@@ -1,9 +1,5 @@
-source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R")
+source("~/TABASCO-MEXCOV-19/src/packages/install.packages.R");
 swabspos <- read.csv(gzfile("~/TABASCO-MEXCOV-19/data/cleansed/0718/swabspos_0718.csv.gz"));
-
-# defaultW <- getOption("warn") 
-# options(warn = -1) 
-# options(warn = defaultW)
 
 #################################################################################################################################################################################################################################################################################
 ## Categorical ##################################################################################################################################################################################################################################################################
@@ -27,12 +23,6 @@ for(i in 1:nrow(indipmatrix))
 {
   for(j in 1:ncol(indipmatrix))
   {
-    if(i == 2 & j == 3 | i == 3 & j == 2)
-    {
-      indipmatrix[i, j] = NA;
-      next;
-    }
-    
     data  = as.data.frame(na.omit(swabspos[, c(rownames(indipmatrix)[i], colnames(indipmatrix)[j])]));
     table = table(data[, 1], data[, 2]);
     indipmatrix[i, j] = as.numeric(chisq.test(table)[3]);
@@ -57,12 +47,6 @@ for(i in 1:nrow(assocmatrix))
 {
   for(j in 1:ncol(assocmatrix))
   {
-    if(i == 2 & j == 3 | i == 3 & j == 2)
-    {
-      assocmatrix[i, j] = NA;
-      next;
-    }
-    
     data  = as.data.frame(na.omit(swabspos[, c(rownames(assocmatrix)[i], colnames(assocmatrix)[j])]));
     table = table(data[, 1], data[, 2]);
     assocmatrix[i, j] = as.numeric(Assocs(table)[3]); 
@@ -101,7 +85,7 @@ ggplot(data = indipData, aes(x = Var1, y = Var2)) +
 
 ggplot(data = swabspos, aes(x = FALLECIDO, y = EDAD)) +
   geom_boxplot(aes(col = FALLECIDO), fill = "white") + 
-  scale_color_manual(values = c("black", "tomato3")) +
+  scale_color_manual(values = c("#009dd0", "#f58f3b")) +
   
   # Custom Label
   labs(title = "",
@@ -113,7 +97,7 @@ ggplot(data = swabspos, aes(x = FALLECIDO, y = EDAD)) +
 
 # par(mfrow = c(1, 2));
 # qqnorm(swabspos$EDAD[swabspos$FALLECIDO == "Yes"], sub = "FALLECIDO | Yes"); qqline(swabspos$EDAD[swabspos$FALLECIDO == "Yes"], col = "tomato3");
-# qqnorm(swabspos$EDAD[swabspos$FALLECIDO == "No"], sub = "FALLECIDO | No"); qqline(swabspos$EDAD[swabspos$FALLECIDO == "No"], col = "dodgerblue3");
+# qqnorm(swabspos$EDAD[swabspos$FALLECIDO == "No"], sub = "FALLECIDO | No");   qqline(swabspos$EDAD[swabspos$FALLECIDO == "No"],  col = "dodgerblue3");
 # par(mfrow = c(1, 1));
 
 t.test(EDAD ~ FALLECIDO, data = swabspos, var.equal = FALSE);
